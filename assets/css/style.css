@@ -1,0 +1,244 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  color: #333;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(-45deg, 
+    #2ec5b6,   /* xanh ngọc */
+    #6ee7b7,   /* xanh mint */
+    #93c5fd,   /* xanh lam nhạt */
+    #c084fc,   /* tím pastel */
+    #f9a8d4    /* hồng nhạt */
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 18s ease infinite;
+}
+
+/* Hiệu ứng chuyển động hologram */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(-45deg, 
+    #2ec5b6,   /* xanh ngọc */
+  #1ad48a,   /* xanh mint */
+    #60aafd,   /* xanh lam nhạt */
+    #bfeaf5  ,   /* tím pastel */
+   #f3dee9  );   /* hồng nhạt */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.navbar .logo {
+  font-weight: 600;
+  color: #0d9488;
+  font-size: 20px;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+.navbar li {
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.navbar li:hover,
+.navbar .active {
+  background: #14b8a6;
+  color: rgb(10, 102, 87);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  width: 40px; /* điều chỉnh kích thước logo */
+  height: 40px;
+  margin-right: 10px; /* khoảng cách giữa logo và text */
+}
+
+.logo span {
+  color: #0f5e5a;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.menu li {
+  color: #fff;
+  cursor: pointer;
+}
+
+.menu li.active {
+  font-weight: bold;
+}
+/* Header */
+.welcome {
+  text-align: center;
+  color: white;
+  margin: 40px 0 20px;
+}
+
+.welcome h2 {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.welcome p {
+  opacity: 0.9;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  background: #bee6e0;/* hoặc gradient hologram bạn muốn */
+  padding: 15px 20px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  width: 300px; /* chỉnh tùy ý */
+}
+.stat-content {
+  display: flex;
+  align-items: center;
+}
+
+.stat-icon-img {
+  width: 60px;   /* kích thước vừa phải */
+  height: 60px;
+  margin-right: 15px; /* khoảng cách giữa icon và text */
+}
+.stat-text h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #115c39;
+}
+
+.stat-text p {
+  margin: 0;
+  font-size: 14px;
+  color: #348066;
+}
+
+.stat-box h4 {
+  color: #0f766e;
+  margin-bottom: 8px;
+}
+
+/* Habits */
+.habits-section {
+  background: white;
+  border-radius: 16px;
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.habits-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+#addHabitBtn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#addHabitBtn:hover {
+  background: #059669;
+}
+
+.habit-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.habit-card {
+  background: #f0fdfa;
+  border-radius: 14px;
+  width: 280px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.habit-card:hover {
+  transform: scale(1.03);
+}
+
+.habit-card input[type="checkbox"] {
+  transform: scale(1.4);
+  margin-right: 10px;
+}
+
+.habit-name {
+  font-weight: 600;
+  color: #0f766e;
+  font-size: 16px;
+}
+
+.habit-desc {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.streak {
+  position: absolute;
+  bottom: 10px;
+  left: 15px;
+  font-size: 13px;
+  color: #ea580c;
+}
+
+.delete-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
+  color: #ef4444;
+  cursor: pointer;
+}

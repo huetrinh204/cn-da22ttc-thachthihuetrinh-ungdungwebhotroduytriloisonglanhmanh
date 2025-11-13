@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habitu 🐱</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">
+    <img src="assets/logo_habitu.png" alt="Habitu Logo" class="logo-img">
+    <span>Habitu</span>
+  </div>
+  <ul class="menu">
+    <li class="active">🏠 Trang Chủ</li>
+    <li>📔 Nhật Ký</li>
+    <li>👥 Cộng Đồng</li>
+    <li>📊 Thống Kê</li>
+    <li>👤 Tài Khoản</li>
+    <li>❓ Hỗ Trợ</li>
+  </ul>
+</nav>
+  <!-- Header -->
+  <header class="welcome">
+    <h2>Chào mừng trở lại! 🐱✨</h2>
+    <p>Hãy tiếp tục xây dựng thói quen lành mạnh của bạn!</p>
+  </header>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="stat-box">
+  <div class="stat-content">
+    <img src="assets/icons/sun.png" alt="Habits Icon" class="stat-icon-img">
+    <div class="stat-text">
+      <h3>Tổng thói quen</h3>
+      <p>3</p>
+    </div>
+  </div>
+</div>
+
+<div class="stat-box">
+  <div class="stat-content">
+    <img src="assets/icons/check.png" alt="Done Icon" class="stat-icon-img">
+    <div class="stat-text">
+      <h3>Hoàn thành hôm nay</h3>
+      <p>1/3 (33%)</p>
+    </div>
+  </div>
+</div>
+
+<div class="stat-box">
+  <div class="stat-content">
+    <img src="assets/icons/streak.png" alt="Streak Icon" class="stat-icon-img">
+    <div class="stat-text">
+      <h3>Tổng chuỗi ngày</h3>
+      <p>15 ngày</p>
+    </div>
+  </div>
+</div>
+
+  </section>
+
+  <!-- Habits List -->
+  <section class="habits-section">
+    <div class="habits-header">
+      <h3>Thói Quen Của Bạn</h3>
+      <button id="addHabitBtn">+ Thêm Thói Quen</button>
+    </div>
+
+    <div id="habitList" class="habit-list">
+      <!-- Habits render here -->
+    </div>
+  </section>
+
+  <script src="./assets/js/dashboard.js"></script>
+</body>
+</html>

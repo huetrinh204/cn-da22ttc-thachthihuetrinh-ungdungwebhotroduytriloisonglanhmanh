@@ -58,6 +58,23 @@ function updateStep() {
     dot.classList.toggle("bg-teal-400", i === currentStep);
     dot.classList.toggle("bg-gray-300", i !== currentStep);
   });
+
+   // Thêm phần đổi text nút
+  const nextBtn = document.getElementById("nextBtn");
+  if (currentStep === totalSteps - 1) {
+  nextBtn.textContent = "Bắt đầu";
+  nextBtn.onclick = () => {
+    window.location.href = "dashboard.html"; // 👉 chuyển sang trang chính
+  };
+}
+   else {
+    nextBtn.textContent = "Tiếp tục";
+    // Quay lại chức năng bình thường
+    nextBtn.onclick = () => {
+      if (currentStep < totalSteps - 1) currentStep++;
+      updateStep();
+    };
+  }
 }
 
 document.getElementById("nextBtn").addEventListener("click", () => {
