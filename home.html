@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
   <title>Habitu - Xây Dựng Thói Quen Lành Mạnh</title>
   <style>
@@ -14,12 +15,21 @@
       font-family: 'Arial', sans-serif;
     }
 
-    body {
-      background-color: #00bfff;
-      color: #fff;
-      scroll-behavior: smooth;
-       font-family: 'Poppins', sans-serif; /* đổi font toàn trang */
-    }
+   body {
+    color: #fbfdfd;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    scroll-behavior: smooth;
+    background: linear-gradient(270deg, #00bfff, #81dddd, #007fff, #00bfff);
+    background-size: 800% 800%;
+    animation: hologramBG 15s ease infinite;
+}
+@keyframes hologramBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
     a {
       text-decoration: none;
@@ -182,18 +192,18 @@
     gap: 30px;
 }
 
-   .feature {
+ .feature {
     background-color: #fff; /* nền trắng */
-    color: #24a2b3; /* chữ đen */
+    color: #22aec7; /* chữ đen */
     padding: 30px;
     border-radius: 20px;
-    transition: transform 0.3s, box-shadow 0.3s;
     text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .feature:hover {
     transform: translateY(-10px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2); /* thêm bóng khi hover */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 .feature h3 {
@@ -204,6 +214,10 @@
 .feature p {
     font-size: 16px;
     line-height: 1.4;
+}
+.feature i {
+    color: #00bfff; /* màu nổi bật */
+    margin-bottom: 15px;
 }
     /* How It Works Section */
     .how-it-works {
@@ -216,42 +230,46 @@
       margin-bottom: 30px;
     }
 
-    .steps {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      flex-wrap: wrap;
-      margin-top: 50px;
-    }
+   .steps {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 50px;
+}
 
-    .step {
-      background-color: rgba(255, 255, 255, 0.15);
-      padding: 30px;
-      border-radius: 20px;
-      width: 200px;
-      transition: transform 0.3s;
-    }
+.step {
+    background-color: #fff;       /* nền trắng */
+    color: #007fff;               /* chữ xanh dương */
+    padding: 30px;
+    border-radius: 20px;
+    width: 200px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
 
-    .step:hover {
-      transform: translateY(-10px);
-      background-color: rgba(255, 255, 255, 0.25);
-    }
+.step:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
 
-    .step-number {
-      font-size: 36px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
+.step-number {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #00bfff; /* số bước nổi bật hơn */
+}
 
-    .step h3 {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
+.step h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
 
-    .step p {
-      font-size: 16px;
-      line-height: 1.4;
-    }
+.step p {
+    font-size: 16px;
+    line-height: 1.4;
+}
 
     /* Anchor scroll offset */
     .anchor {
@@ -277,6 +295,88 @@
     }
 }
 
+.community {
+    padding: 100px 50px;
+    text-align: center;
+}
+
+.community h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #ffffff; /* tiêu đề nổi bật */
+}
+
+.community > p {
+    font-size: 16px;
+    margin-bottom: 50px;
+    color: #fff; /* chữ ngoài card màu trắng */
+}
+
+.community-grid {
+    display: flex;
+    justify-content: center; /* căn giữa toàn bộ 3 card */
+    gap: 15px; /* khoảng cách giữa các card */
+    flex-wrap: nowrap;
+}
+
+.community-card {
+    background-color: #fff;  
+    color: #000 !important; /* chữ trong card màu đen chắc chắn */
+    padding: 20px;
+    border-radius: 20px;
+    width: 280px;           
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: left;
+    flex: 0 0 auto;         
+}
+
+.community-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.community-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.community-emoji {
+    font-size: 30px;       
+}
+
+.community-header h3 {
+    font-size: 18px;       
+    margin: 0;
+    font-weight: 600;
+    color: #000;
+}
+
+.streak {
+    font-size: 14px;       
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.feedback {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #000;
+}
+
+/* Responsive cho màn hình nhỏ */
+@media screen and (max-width: 900px) {
+    .community-grid {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .community-card {
+        margin-bottom: 20px;
+    }
+}
   </style>
 </head>
 <body>
@@ -304,7 +404,7 @@
     <img src="./assets/logo_habitu.png" alt="Logo" class="hero-logo">
     <h1>
       Xây Dựng Thói Quen Lành Mạnh<br>
-      Cùng Bạn Mèo Dễ Thương 🐱<br>
+      Cùng Habitu Bạn Nhé! 🐱<br>
       </h1>
       <h3>
       Theo dõi tiến độ, duy trì chuỗi ngày, và kết nối với cộng đồng<br>
@@ -317,32 +417,38 @@
   <span id="features" class="anchor"></span>
   <section class="features">
     <h2>Tính Năng</h2>
-    <div class="feature-grid">
-      <div class="feature">
-        <h3>Theo Dõi Thói Quen</h3>
-        <p>Thêm và quản lý các thói quen lành mạnh của bạn một cách dễ dàng</p>
-      </div>
-      <div class="feature">
-        <h3>Chuỗi Ngày Liên Tục</h3>
-        <p>Duy trì chuỗi ngày hoàn thành để tạo động lực mỗi ngày</p>
-      </div>
-      <div class="feature">
-        <h3>Cộng Đồng Hỗ Trợ</h3>
-        <p>Chia sẻ và học hỏi kinh nghiệm từ cộng đồng năng động</p>
-      </div>
-      <div class="feature">
-        <h3>Nhật Ký Cá Nhân</h3>
-        <p>Ghi lại cảm xúc và suy nghĩ của bạn trong hành trình</p>
-      </div>
-      <div class="feature">
-        <h3>Thống Kê Chi Tiết</h3>
-        <p>Xem báo cáo trực quan về tiến độ và thành tích của bạn</p>
-      </div>
-      <div class="feature">
-        <h3>Giao Diện Dễ Thương</h3>
-        <p>Thiết kế đẹp mắt với hiệu ứng holographic lung linh</p>
-      </div>
-    </div>
+   <div class="feature-grid">
+  <div class="feature">
+    <i class="fa-solid fa-eye fa-2x"></i> <!-- icon dễ thương -->
+    <h3>Theo Dõi Thói Quen</h3>
+    <p>Thêm và quản lý các thói quen lành mạnh của bạn một cách dễ dàng</p>
+  </div>
+  <div class="feature">
+    <i class="fa-solid fa-calendar-days fa-2x"></i>
+    <h3>Chuỗi Ngày Liên Tục</h3>
+    <p>Duy trì chuỗi ngày hoàn thành để tạo động lực mỗi ngày</p>
+  </div>
+  <div class="feature">
+    <i class="fa-solid fa-users fa-2x"></i>
+    <h3>Cộng Đồng Hỗ Trợ</h3>
+    <p>Chia sẻ và học hỏi kinh nghiệm từ cộng đồng năng động</p>
+  </div>
+  <div class="feature">
+    <i class="fa-solid fa-book-open fa-2x"></i>
+    <h3>Nhật Ký Cá Nhân</h3>
+    <p>Ghi lại cảm xúc và suy nghĩ của bạn trong hành trình</p>
+  </div>
+  <div class="feature">
+    <i class="fa-solid fa-chart-line fa-2x"></i>
+    <h3>Thống Kê Chi Tiết</h3>
+    <p>Xem báo cáo trực quan về tiến độ và thành tích của bạn</p>
+  </div>
+  <div class="feature">
+    <i class="fa-solid fa-heart fa-2x"></i>
+    <h3>Giao Diện Dễ Thương</h3>
+    <p>Thiết kế đẹp mắt với hiệu ứng holographic lung linh</p>
+  </div>
+</div>
   </section>
 
   <!-- How It Works Section -->
@@ -375,10 +481,41 @@
   </section>
 
   <!-- Placeholder sections for menu links -->
-  <span id="community" class="anchor"></span>
-  <section style="height: 300px; text-align:center; padding-top:50px;">
-    <h2>Cộng đồng</h2>
-  </section>
+  <!-- Community Section -->
+<span id="community" class="anchor"></span>
+<section class="community" style="padding:100px 50px; text-align:center;">
+    <h2>Cộng Đồng</h2>
+    <p>Người dùng chia sẻ trải nghiệm khi sử dụng Habitu</p>
+   <div class="community-grid">
+  <div class="community-card">
+      <div class="community-header">
+          <div class="community-emoji">😊</div>
+          <h3>Minh Anh</h3>
+      </div>
+      <p class="streak">90 ngày streak</p>
+      <p class="feedback">"Mèo Thói Quen đã giúp tôi duy trì việc tập thể dục được 3 tháng liên tục! Giao diện dễ thương và tính năng chuỗi ngày rất tạo động lực."</p>
+  </div>
+
+  <div class="community-card">
+      <div class="community-header">
+          <div class="community-emoji">🤓</div>
+          <h3>Tuấn Kiệt</h3>
+      </div>
+      <p class="streak">45 ngày streak</p>
+      <p class="feedback">"Tôi thích nhất là tính năng cộng đồng. Được chia sẻ và học hỏi từ những người khác thực sự hữu ích!"</p>
+  </div>
+
+  <div class="community-card">
+      <div class="community-header">
+          <div class="community-emoji">🌸</div>
+          <h3>Thu Hà</h3>
+      </div>
+      <p class="streak">60 ngày streak</p>
+      <p class="feedback">"App dễ sử dụng, giao diện đẹp và hiệu ứng holographic rất bắt mắt. Cảm ơn team đã tạo ra sản phẩm tuyệt vời!"</p>
+  </div>
+</div>
+</section>
+
 
   <span id="about" class="anchor"></span>
   <section style="height: 300px; text-align:center; padding-top:50px;">
