@@ -55,11 +55,13 @@
       align-items: center;
       font-weight: bold;
       font-size: 24px;
+      border-radius: 60%;
     }
 
     .navbar .logo img {
       width: 40px;
       margin-right: 10px;
+      border-radius: 60%;
     }
 
     .navbar .menu {
@@ -130,6 +132,7 @@
     background-color: #ffffff; /* hoặc màu nhạt nổi bật */
     border-radius: 60%;      /* nếu logo tròn */
 }
+
     .hero .hero-logo {
       width: 150px;
       height: 150px;
@@ -305,7 +308,10 @@
     margin-bottom: 10px;
     color: #ffffff; /* tiêu đề nổi bật */
 }
-
+.community h3{
+    font-style: normal;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
 .community > p {
     font-size: 16px;
     margin-bottom: 50px;
@@ -322,6 +328,7 @@
 .community-card {
     background-color: #fff;  
     color: #000 !important; /* chữ trong card màu đen chắc chắn */
+    font-style: italic;
     padding: 20px;
     border-radius: 20px;
     width: 280px;           
@@ -354,13 +361,6 @@
     color: #000;
 }
 
-.streak {
-    font-size: 14px;       
-    font-weight: 500;
-    margin-bottom: 10px;
-    color: #000;
-}
-
 .feedback {
     font-size: 14px;
     line-height: 1.5;
@@ -377,6 +377,150 @@
         margin-bottom: 20px;
     }
 }
+
+.about {
+    padding: 100px 50px;
+    text-align: center;
+}
+
+.about h2 {
+    font-size: 32px;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+.about > p {
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 50px;
+}
+
+.team-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: nowrap;
+    margin-bottom: 60px; /* cách CTA */
+}
+
+.team-card {
+    background-color: #fff;
+    color: #000;
+    padding: 20px;
+    border-radius: 20px;
+    width: 250px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.team-avatar {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.team-card h3 {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.team-card p {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Phần CTA trong About */
+.about-cta {
+    padding: 60px 20px;
+    background: #ffffff; /* holographic nhẹ */
+    border-radius: 25px;
+    max-width: 600px;
+    margin: 0 auto;
+    color: #11a7cc;
+    text-align: center;
+}
+
+.about-cta .cta-logo {
+    width: 80px;
+    margin-bottom: 20px;
+    animation: bounce 2s infinite;
+}
+
+.about-cta h2 {
+    color:#11a7cc;
+    font-size: 28px;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.about-cta p {
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.about-cta .cta-button {
+    display: inline-block;
+    background-color: #0d98a1;
+    color: #fafbfc;
+    font-weight: 600;
+    padding: 15px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.about-cta .cta-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.about-cta .cta-subtext {
+    font-size: 14px;
+    margin-top: 15px;
+    opacity: 0.9;
+}
+
+/* Hiệu ứng logo bounce */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+    .about h2 {
+        font-size: 26px;
+    }
+    .about > p {
+        font-size: 14px;
+    }
+    .team-card {
+        width: 220px;
+    }
+    .about-cta {
+        padding: 40px 15px;
+    }
+    .about-cta h2 {
+        font-size: 24px;
+    }
+    .about-cta p, .about-cta .cta-subtext {
+        font-size: 14px;
+    }
+    .about-cta .cta-logo {
+        width: 60px;
+    }
+    .about-cta .cta-button {
+        padding: 12px 25px;
+    }
+}
+
+
   </style>
 </head>
 <body>
@@ -394,7 +538,7 @@
       <a href="#about">VỀ CHÚNG TÔI</a>
     </div>
     <div class="auth-buttons">
-      <button class="login">Đăng nhập</button>
+      <button class="login" onclick="location.href='dangnhap.html'">Đăng nhập</button>
       <button class="signup" onclick="location.href='dangky.html'">Đăng ký miễn phí</button>
     </div>
   </nav>
@@ -492,8 +636,7 @@
           <div class="community-emoji">😊</div>
           <h3>Minh Anh</h3>
       </div>
-      <p class="streak">90 ngày streak</p>
-      <p class="feedback">"Mèo Thói Quen đã giúp tôi duy trì việc tập thể dục được 3 tháng liên tục! Giao diện dễ thương và tính năng chuỗi ngày rất tạo động lực."</p>
+      <p class="feedback">"Habitu đã giúp tôi duy trì việc tập thể dục được 3 tháng liên tục! Giao diện dễ thương và tính năng chuỗi ngày rất tạo động lực."</p>
   </div>
 
   <div class="community-card">
@@ -501,7 +644,6 @@
           <div class="community-emoji">🤓</div>
           <h3>Tuấn Kiệt</h3>
       </div>
-      <p class="streak">45 ngày streak</p>
       <p class="feedback">"Tôi thích nhất là tính năng cộng đồng. Được chia sẻ và học hỏi từ những người khác thực sự hữu ích!"</p>
   </div>
 
@@ -510,17 +652,27 @@
           <div class="community-emoji">🌸</div>
           <h3>Thu Hà</h3>
       </div>
-      <p class="streak">60 ngày streak</p>
       <p class="feedback">"App dễ sử dụng, giao diện đẹp và hiệu ứng holographic rất bắt mắt. Cảm ơn team đã tạo ra sản phẩm tuyệt vời!"</p>
   </div>
 </div>
 </section>
 
 
-  <span id="about" class="anchor"></span>
-  <section style="height: 300px; text-align:center; padding-top:50px;">
-    <h2>Về chúng tôi</h2>
-  </section>
+ <span id="about" class="anchor"></span>
+<section class="about">
+    <h2>Về Chúng Tôi</h2>
+    <p>Habitu được phát triển bởi Huệ Trinh, với mục tiêu giúp bạn xây dựng thói quen lành mạnh và kết nối cộng đồng.</p>
+    
+    <!-- Call to Action nằm trong About -->
+    <div class="about-cta">
+        <img src="./assets/logo_habitu.png" alt="Habitu Logo" class="cta-logo">
+        <h2>Bạn Đã Sẵn Sàng Chưa?</h2>
+        <p>Tham gia cộng đồng hàng nghìn người đang xây dựng thói quen lành mạnh mỗi ngày</p>
+        <a href="dangky.html" class="cta-button">Đăng Ký Miễn Phí Ngay</a>
+        <p class="cta-subtext">Không cần thẻ tín dụng • Hủy bất cứ lúc nào • Hỗ trợ 24/7</p>
+    </div>
+</section>
+
 
 </body>
 </html>

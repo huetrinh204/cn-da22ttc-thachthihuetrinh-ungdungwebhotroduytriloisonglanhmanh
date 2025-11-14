@@ -47,6 +47,7 @@ body {
   font-weight: 600;
   color: #0d9488;
   font-size: 20px;
+  border-radius: 60%;
 }
 
 .navbar ul {
@@ -71,12 +72,14 @@ body {
 .logo {
   display: flex;
   align-items: center;
+  border-radius: 60%;
 }
 
 .logo-img {
   width: 40px; /* điều chỉnh kích thước logo */
   height: 40px;
   margin-right: 10px; /* khoảng cách giữa logo và text */
+  border-radius: 60%;
 }
 
 .logo span {
