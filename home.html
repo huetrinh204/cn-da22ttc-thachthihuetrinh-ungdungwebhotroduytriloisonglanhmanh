@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <title>Habitu - Xây Dựng Thói Quen Lành Mạnh</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background-color: #00bfff;
+      color: #fff;
+      scroll-behavior: smooth;
+       font-family: 'Poppins', sans-serif; /* đổi font toàn trang */
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      background-color: rgba(0, 191, 255, 0.95);
+      z-index: 1000;
+    }
+
+    .navbar .logo {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      font-size: 24px;
+    }
+
+    .navbar .logo img {
+      width: 40px;
+      margin-right: 10px;
+    }
+
+    .navbar .menu {
+      display: flex;
+      gap: 30px;
+      font-size: 18px;
+    }
+
+    .navbar .auth-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .navbar .auth-buttons button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .navbar .auth-buttons .login {
+      background-color: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+    }
+
+    .navbar .auth-buttons .login:hover {
+      background-color: #fff;
+      color: #00bfff;
+    }
+
+    .navbar .auth-buttons .signup {
+   
+      background-color: #64c3fa;
+      color: #fbfdfd;
+    }
+
+    .navbar .auth-buttons .signup:hover {
+      background-color: #c5f5f8;
+       color: #088181;
+    }
+.navbar {
+  background-color: rgba(252, 252, 252, 0.90); /* trắng bán trong suốt */
+  color: #00bfff; /* đổi chữ/ nút cho nổi bật */
+}
+.navbar .auth-buttons .login {
+  border: 2px solid #00bfff;
+  color: #00bfff;
+}
+.navbar .auth-buttons .login:hover {
+  background-color: #00bfff;
+  color: #fff;
+}
+    /* Hero Section */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100vh;
+      padding-top: 60px;
+    }
+
+    .hero-logo {
+    background-color: #ffffff; /* hoặc màu nhạt nổi bật */
+    border-radius: 60%;      /* nếu logo tròn */
+}
+    .hero .hero-logo {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 30px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+   .hero h1 {
+    font-size: 36px;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    font-weight: 700; /* đậm hơn */
+}
+
+.hero h3 {
+    font-size: 20px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 600px;
+    text-align: center;
+    font-weight: 400; /* nhẹ hơn h1 */
+}
+
+    .hero .start-button {
+      padding: 15px 40px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 30px;
+      border: none;
+      background-color: #fff;
+      color: #00bfff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .hero .start-button:hover {
+      transform: scale(1.1);
+    }
+
+    /* Features Section */
+    .features {
+      padding: 100px 50px 50px;
+      text-align: center;
+    }
+
+    .features h2 {
+      font-size: 32px;
+      margin-bottom: 50px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
+
+    .feature {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 30px;
+      border-radius: 20px;
+      transition: transform 0.3s;
+    }
+
+    .feature:hover {
+      transform: translateY(-10px);
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .feature h3 {
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+
+    .feature p {
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    /* How It Works Section */
+    .how-it-works {
+      padding: 100px 50px;
+      text-align: center;
+    }
+
+    .how-it-works h2 {
+      font-size: 32px;
+      margin-bottom: 30px;
+    }
+
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-top: 50px;
+    }
+
+    .step {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 30px;
+      border-radius: 20px;
+      width: 200px;
+      transition: transform 0.3s;
+    }
+
+    .step:hover {
+      transform: translateY(-10px);
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .step-number {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .step h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    /* Anchor scroll offset */
+    .anchor {
+      display: block;
+      position: relative;
+      top: -70px;
+      visibility: hidden;
+    }
+
+    @media(max-width: 768px){
+      .navbar .menu {
+        display: none;
+      }
+
+      .steps {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="./assets/logo_habitu.png" alt="Logo">
+      Habitu
+    </div>
+    <div class="menu">
+      <a href="#features">Tính Năng</a>
+      <a href="#how">Cách Hoạt Động</a>
+      <a href="#community">Cộng đồng</a>
+      <a href="#about">Về chúng tôi</a>
+    </div>
+    <div class="auth-buttons">
+      <button class="login">Đăng nhập</button>
+      <button class="signup" onclick="location.href='dangky.html'">Đăng ký miễn phí</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <img src="./assets/logo_habitu.png" alt="Logo" class="hero-logo">
+    <h1>
+      Xây Dựng Thói Quen Lành Mạnh<br>
+      Cùng Bạn Mèo Dễ Thương 🐱<br>
+      </h1>
+      <h3>
+      Theo dõi tiến độ, duy trì chuỗi ngày, và kết nối với cộng đồng<br>
+      để xây dựng phiên bản tốt nhất của chính bạn
+    </h3>
+    <button class="start-button" onclick="location.href='dangky.html'">Bắt đầu ngay</button>
+  </section>
+
+  <!-- Features Section -->
+  <span id="features" class="anchor"></span>
+  <section class="features">
+    <h2>Tính Năng</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <h3>Theo Dõi Thói Quen</h3>
+        <p>Thêm và quản lý các thói quen lành mạnh của bạn một cách dễ dàng</p>
+      </div>
+      <div class="feature">
+        <h3>Chuỗi Ngày Liên Tục</h3>
+        <p>Duy trì chuỗi ngày hoàn thành để tạo động lực mỗi ngày</p>
+      </div>
+      <div class="feature">
+        <h3>Cộng Đồng Hỗ Trợ</h3>
+        <p>Chia sẻ và học hỏi kinh nghiệm từ cộng đồng năng động</p>
+      </div>
+      <div class="feature">
+        <h3>Nhật Ký Cá Nhân</h3>
+        <p>Ghi lại cảm xúc và suy nghĩ của bạn trong hành trình</p>
+      </div>
+      <div class="feature">
+        <h3>Thống Kê Chi Tiết</h3>
+        <p>Xem báo cáo trực quan về tiến độ và thành tích của bạn</p>
+      </div>
+      <div class="feature">
+        <h3>Giao Diện Dễ Thương</h3>
+        <p>Thiết kế đẹp mắt với hiệu ứng holographic lung linh</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <span id="how" class="anchor"></span>
+  <section class="how-it-works">
+    <h2>Cách Hoạt Động</h2>
+    <p>Đơn giản chỉ với 4 bước</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Đăng Ký Tài Khoản</h3>
+        <p>Tạo tài khoản miễn phí chỉ trong vài giây</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Thêm Thói Quen</h3>
+        <p>Chọn hoặc tạo các thói quen bạn muốn xây dựng</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Đánh Dấu Hoàn Thành</h3>
+        <p>Đánh dấu hoàn thành thói quen mỗi ngày</p>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <h3>Theo Dõi Tiến Độ</h3>
+        <p>Xem thống kê và duy trì chuỗi ngày</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Placeholder sections for menu links -->
+  <span id="community" class="anchor"></span>
+  <section style="height: 300px; text-align:center; padding-top:50px;">
+    <h2>Cộng đồng</h2>
+  </section>
+
+  <span id="about" class="anchor"></span>
+  <section style="height: 300px; text-align:center; padding-top:50px;">
+    <h2>Về chúng tôi</h2>
+  </section>
+
+</body>
+</html>
