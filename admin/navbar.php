@@ -44,7 +44,7 @@
     <!-- Dropdown -->
     <div id="adminDropdown" class="absolute top-full mt-1 left-0 w-44 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg shadow-lg hidden z-50">
        
-        <a href="logout.php" class="flex items-center gap-2 px-4 py-2 hover:opacity-80 rounded-b-lg">
+        <a href="../home.html" class="flex items-center gap-2 px-4 py-2 hover:opacity-80 rounded-b-lg">
             <i class="fas fa-sign-out-alt"></i> Đăng xuất
         </a>
     </div>
