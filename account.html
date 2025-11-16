@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tài Khoản | Habitu 🐱</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-to-br from-cyan-300 via-teal-300 to-teal-500 min-h-screen">
+
+<!-- NAV -->
+<nav class="flex justify-between px-8 py-3 items-center bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg">
+    <div class="flex items-center gap-3">
+        <img style="border-radius: 60%;" src="assets/logo_habitu.png" width="38" alt="Habitu Logo">
+        <h2 class="text-xl font-bold">Habitu</h2>
+    </div>
+
+    <ul class="flex gap-8 font-medium">
+        <li class="flex items-center gap-1">
+            <i class="fas fa-home"></i>
+            <a href="dashboard.html" class="hover:text-yellow-300 transition">Trang Chủ</a>
+        </li>
+        <li class="flex items-center gap-1">
+            <i class="fas fa-book"></i>
+            <a href="journal.html" class="hover:text-yellow-300 transition">Nhật Ký</a>
+        </li>
+        <li class="flex items-center gap-1">
+            <i class="fas fa-users"></i>
+            <a href="community.html" class="hover:text-yellow-300 transition">Cộng Đồng</a>
+        </li>
+        <li class="flex items-center gap-1">
+            <i class="fas fa-chart-bar"></i>
+            <a href="thongke.html" class="hover:text-yellow-300 transition">Thống Kê</a>
+        </li>
+        <li class="flex items-center gap-1">
+            <i class="fas fa-user"></i>
+            <a href="account.html" class="text-yellow-300 underline underline-offset-4">Tài Khoản</a>
+        </li>
+        <li class="flex items-center gap-1">
+            <i class="fas fa-question-circle"></i>
+            <a href="support.html" class="hover:text-yellow-300 transition">Hỗ Trợ</a>
+        </li>
+    </ul>
+
+    <div class="flex items-center gap-2">
+        <i class="fas fa-user-circle text-xl"></i>
+        <span>Người dùng</span>
+    </div>
+</nav>
+
+
+
+<!-- PAGE TITLE -->
+<header class="text-center py-6">
+  <h2 class="text-2xl font-semibold text-white drop-shadow-lg">
+    Tài Khoản Cá Nhân 🐱✨
+  </h2>
+  <p class="text-gray-100">Cập nhật thông tin và bảo mật tài khoản của bạn</p>
+</header>
+
+
+<!-- MAIN CONTENT -->
+<div class="max-w-4xl mx-auto px-6 space-y-6 pb-16">
+
+    <!-- Hồ sơ cá nhân -->
+    <div class="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-4 flex gap-2">
+            <i class="fas fa-id-card text-blue-500"></i> Hồ Sơ Cá Nhân
+        </h3>
+
+        <label class="text-sm font-medium">Tên hiển thị</label>
+        <input type="text" class="w-full mt-1 mb-4 p-2 border rounded-lg" placeholder="Người dùng">
+
+        <label class="text-sm font-medium">Email</label>
+        <input type="email" class="w-full mt-1 mb-4 p-2 border rounded-lg" placeholder="user@example.com">
+
+        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+            Cập Nhật Thông Tin
+        </button>
+    </div>
+
+
+    <!-- Đổi mật khẩu -->
+    <div class="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-4 flex gap-2">
+            <i class="fas fa-lock text-orange-500"></i> Đổi Mật Khẩu
+        </h3>
+
+        <label class="text-sm font-medium">Mật khẩu hiện tại</label>
+        <input type="password" class="w-full mt-1 mb-3 p-2 border rounded-lg">
+
+        <label class="text-sm font-medium">Mật khẩu mới</label>
+        <input type="password" class="w-full mt-1 mb-3 p-2 border rounded-lg">
+
+        <label class="text-sm font-medium">Xác nhận mật khẩu mới</label>
+        <input type="password" class="w-full mt-1 mb-4 p-2 border rounded-lg">
+
+        <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
+            Đổi Mật Khẩu
+        </button>
+    </div>
+
+
+    <!-- Thông báo -->
+    <div class="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-4 flex gap-2">
+            <i class="fas fa-bell text-purple-500"></i> Thông Báo
+        </h3>
+
+        <!-- notification -->
+        <div class="flex justify-between py-3 border-b">
+            <span>Thông báo đẩy</span>
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="flex justify-between py-3">
+            <span>Thông báo email</span>
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- CUSTOM SWITCH STYLE -->
+<style>
+.switch {
+  position: relative;
+  width: 46px;
+  height: 24px;
+  display: inline-block;
+}
+.switch input { display: none; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 34px;
+  inset: 0;
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+input:checked + .slider {
+  background-color: #4ade80;
+}
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+</style>
+
+</body>
+</html>
