@@ -13,8 +13,7 @@ body {
     #2ec5b6,   /* xanh ngọc */
     #6ee7b7,   /* xanh mint */
     #93c5fd,   /* xanh lam nhạt */
-    #c084fc,   /* tím pastel */
-    #f9a8d4    /* hồng nhạt */
+  
   );
   background-size: 400% 400%;
   animation: gradientShift 18s ease infinite;
