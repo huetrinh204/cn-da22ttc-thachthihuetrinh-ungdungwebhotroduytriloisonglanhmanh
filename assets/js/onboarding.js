@@ -1,3 +1,5 @@
+// onboarding.js
+
 const steps = [
   {
     title: "Chào mừng đến với Habitu! 🐱",
@@ -39,56 +41,59 @@ const steps = [
 let currentStep = 0;
 const totalSteps = steps.length;
 
-const title = document.getElementById("guideTitle");
-const text = document.getElementById("guideText");
-const img = document.getElementById("guideIcon");
+// DOM Elements
+const titleEl = document.getElementById("guideTitle");
+const textEl = document.getElementById("guideText");
+const imgEl = document.getElementById("guideIcon");
 const stepLabel = document.getElementById("stepLabel");
-const progress = document.getElementById("progressBar");
+const progressBar = document.getElementById("progressBar");
 const dots = document.querySelectorAll(".dot");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const closeBtn = document.getElementById("closeBtn");
 
+// Cập nhật nội dung bước hiện tại
 function updateStep() {
   const step = steps[currentStep];
-  title.textContent = step.title;
-  text.textContent = step.text;
-  img.src = step.img;
+  titleEl.textContent = step.title;
+  textEl.textContent = step.text;
+  imgEl.src = step.img;
   stepLabel.textContent = `Bước ${currentStep + 1} / ${totalSteps}`;
-  progress.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
+  progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
 
   dots.forEach((dot, i) => {
     dot.classList.toggle("bg-teal-400", i === currentStep);
     dot.classList.toggle("bg-gray-300", i !== currentStep);
   });
 
-   // Thêm phần đổi text nút
-  const nextBtn = document.getElementById("nextBtn");
-  if (currentStep === totalSteps - 1) {
-  nextBtn.textContent = "Bắt đầu";
-  nextBtn.onclick = () => {
-    window.location.href = "dashboard.html"; // 👉 chuyển sang trang chính
-  };
+  // Nút Tiếp Theo đổi text nếu là bước cuối
+  nextBtn.textContent = currentStep === totalSteps - 1 ? "Bắt đầu" : "Tiếp Theo →";
+
+  // Vô hiệu hóa nút Quay Lại nếu đang ở bước đầu
+  prevBtn.disabled = currentStep === 0;
 }
-   else {
-    nextBtn.textContent = "Tiếp tục";
-    // Quay lại chức năng bình thường
-    nextBtn.onclick = () => {
-      if (currentStep < totalSteps - 1) currentStep++;
-      updateStep();
-    };
+
+// Event listener chỉ bind 1 lần
+nextBtn.addEventListener("click", () => {
+  if (currentStep < totalSteps - 1) {
+    currentStep++;
+    updateStep();
+  } else {
+    // Chuyển đến dashboard
+    window.location.href = "dashboard.php";
   }
-}
-
-document.getElementById("nextBtn").addEventListener("click", () => {
-  if (currentStep < totalSteps - 1) currentStep++;
-  updateStep();
 });
 
-document.getElementById("prevBtn").addEventListener("click", () => {
-  if (currentStep > 0) currentStep--;
-  updateStep();
+prevBtn.addEventListener("click", () => {
+  if (currentStep > 0) {
+    currentStep--;
+    updateStep();
+  }
 });
 
-document.getElementById("closeBtn").addEventListener("click", () => {
-  document.querySelector(".fixed").classList.add("hidden");
+closeBtn.addEventListener("click", () => {
+  document.querySelector(".fixed")?.classList.add("hidden");
 });
 
+// Khởi tạo bước đầu tiên
 updateStep();

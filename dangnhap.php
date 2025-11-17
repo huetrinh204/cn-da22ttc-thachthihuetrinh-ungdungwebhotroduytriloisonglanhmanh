@@ -35,6 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $popup = "Đăng nhập thành công!";
             $success = true;
+
+            // Chuyển đến onboarding (index.php)
+    header("Location: index.php");
+    exit();
         }
     } catch (PDOException $e) {
         $popup = "Lỗi: " . $e->getMessage();
@@ -152,13 +156,60 @@ input[type="password"] {
     <p class="signup-link">Chưa có tài khoản? <a href="dangky.php">Đăng ký ngay</a></p>
   </div>
 
+ 
   <!-- popup -->
-  <div id="popup">
-    <div class="box">
-      <button class="close" onclick="document.getElementById('popup').style.display='none'">&times;</button>
-      <p id="popupText"></p>
-    </div>
+<div id="popup">
+  <div class="box">
+    <button class="close" onclick="document.getElementById('popup').style.display='none'">&times;</button>
+    <p id="popupText"></p>
   </div>
+</div>
+
+<style>
+  /* popup nền mờ toàn trang */
+  #popup {
+    display: none;
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.4); 
+    justify-content: center; align-items: center; z-index:9999;
+    animation: fadeIn 0.3s;
+  }
+
+  #popup .box {
+    background: #ffffff;
+    padding: 25px 35px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 350px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    font-family: 'Inter', sans-serif;
+    color: #0072ff; /* chữ xanh giống nền */
+    font-size: 16px;
+    position: relative;
+    animation: slideDown 0.3s;
+  }
+
+  #popup .box button.close {
+    position: absolute; top:10px; right:12px;
+    border:none; background:none; font-size:20px; cursor:pointer;
+    color: #0072ff;
+    transition: transform 0.2s, color 0.2s;
+  }
+  #popup .box button.close:hover {
+    color: #004c99;
+    transform: scale(1.2);
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0;} to {opacity:1;}
+  }
+
+  @keyframes slideDown {
+    from {transform: translateY(-20px); opacity:0;} 
+    to {transform: translateY(0); opacity:1;}
+  }
+</style>
+
 
 <script>
   <?php if(!empty($popup)): ?>

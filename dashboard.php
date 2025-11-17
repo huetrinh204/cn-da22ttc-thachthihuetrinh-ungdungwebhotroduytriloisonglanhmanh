@@ -3,7 +3,7 @@ session_start();
 
 // Nếu chưa đăng nhập → chuyển về trang đăng nhập
 if (!isset($_SESSION["user_id"])) {
-    header("Location: dangnhap.html");
+    header("Location: dangnhap.php");
     exit();
 }
 
@@ -58,10 +58,22 @@ $username = $_SESSION["username"];
             <a href="support.html" class="hover:text-yellow-300 transition">Hỗ Trợ</a></li>
     </ul>
 
-    <div class="flex items-center gap-2">
+<!-- Container username -->
+<div class="relative inline-block group">
+  <!-- Nút username -->
+  <button class="flex items-center gap-2 text-white focus:outline-none">
     <i class="fas fa-user-circle text-xl"></i>
     <span><?php echo htmlspecialchars($username); ?></span>
-    <a href="logout.php" class="ml-3 text-sm underline">Đăng xuất</a>
+    <i class="fas fa-chevron-down text-sm"></i>
+  </button>
+
+  <!-- Dropdown -->
+  <div class="absolute right-0 mt-2 w-max bg-gradient-to-r from-purple-600 to-pink-500 rounded-xl py-2 px-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg">
+    <a href="home.html" class="flex items-center gap-2 px-4 py-2 text-white hover:text-yellow-300 hover:bg-transparent transition-all rounded-lg whitespace-nowrap">
+      <i class="fas fa-sign-out-alt"></i>
+      Đăng xuất
+    </a>
+  </div>
 </div>
 </nav>
 

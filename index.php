@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+// Nếu chưa đăng nhập → chuyển về dangnhap.php
+if (!isset($_SESSION["user_id"])) {
+    header("Location: dangnhap.php");
+    exit();
+}
+
+// Lấy username để hiển thị (nếu muốn chào)
+$username = $_SESSION["username"];
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -6,13 +18,13 @@
   <title>HABITU - Hướng Dẫn</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-  
+    /* Giữ nguyên tất cả CSS như file gốc của bạn */
   </style>
 </head>
 <body class="flex items-center justify-center min-h-screen" style="background-color: #00bfff;">
   <div class="flex items-center justify-center min-h-screen bg-[#00bfff]/20">
     <!-- Popup -->
-    <div class="bg-white rounded-2xl w-[90%] max-w-md shadow-lg p-6 relative">
+    <div class="bg-white rounded-2xl w-[90%] max-w-lg shadow-lg p-6 relative">
       <!-- Nút đóng -->
       <button id="closeBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">✕</button>
 
@@ -29,7 +41,9 @@
       <!-- Nội dung hướng dẫn -->
       <div id="guideContent" class="text-center space-y-4 py-6">
         <img id="guideIcon" src="./assets/images/party.png" class="mx-auto w-20 h-20 rounded-full" alt="icon">
-        <h2 id="guideTitle" class="text-xl font-semibold text-gray-800">Chào mừng đến với Mèo Thói Quen! 🐱</h2>
+        <h2 id="guideTitle" class="text-xl font-semibold text-gray-800">
+          Chào mừng <?php echo htmlspecialchars($username); ?> đến với Habitu! 🐱
+        </h2>
         <p id="guideText" class="text-gray-600">
           Ứng dụng giúp bạn xây dựng và duy trì các thói quen lành mạnh một cách dễ dàng và vui vẻ.
         </p>
@@ -43,7 +57,6 @@
         <button id="nextBtn" class="px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600">
           Tiếp Theo →
         </button>
-        
       </div>
 
       <!-- Dấu chấm chỉ bước -->
