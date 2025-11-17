@@ -1,3 +1,16 @@
+<?php
+session_start();
+
+// Nếu chưa đăng nhập → chuyển về trang đăng nhập
+if (!isset($_SESSION["user_id"])) {
+    header("Location: dangnhap.html");
+    exit();
+}
+
+// Lấy username từ session
+$username = $_SESSION["username"];
+?>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -46,9 +59,10 @@
     </ul>
 
     <div class="flex items-center gap-2">
-        <i class="fas fa-user-circle text-xl"></i>
-        <span>Người dùng</span>
-    </div>
+    <i class="fas fa-user-circle text-xl"></i>
+    <span><?php echo htmlspecialchars($username); ?></span>
+    <a href="logout.php" class="ml-3 text-sm underline">Đăng xuất</a>
+</div>
 </nav>
 
 <!-- Header -->

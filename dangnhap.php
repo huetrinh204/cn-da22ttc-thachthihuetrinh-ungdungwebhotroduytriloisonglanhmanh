@@ -1,6 +1,8 @@
 <?php
 session_start();
 require "config.php";
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
@@ -13,12 +15,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
-        die("Email không tồn tại!");
+        echo "<script>alert('Email không tồn tại!'); window.location.href='dangnhap.html';</script>";
+        exit();
     }
 
     // Kiểm tra mật khẩu
     if (!password_verify($password, $user["password"])) {
-        die("Sai mật khẩu!");
+        echo "<script>alert('Sai mật khẩu!'); window.location.href='dangnhap.html';</script>";
+        exit();
     }
 
     // Lưu session đăng nhập
@@ -31,8 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE user_id = ?")
         ->execute([$user["user_id"]]);
 
-    // Chuyển đến trang dashboard hoặc trang chủ
-    header("Location: home.html");
+    // Chuyển đến dashboard.php (để hiển thị username)
+    header("Location: dashboard.php");
     exit();
 }
 ?>
