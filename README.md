@@ -45,17 +45,28 @@ Habitu là một **ứng dụng web cute và trực quan**, giúp bạn **xây d
 ## 🏠 Cấu trúc dự án
 
 habitu/
-├─ assets/      # chứa các tài nguyên tĩnh
+├─ assets/   # chứa các tài nguyên tĩnh
+
 │  ├─ css/      # File CSS cho style của trang
+
 │  ├─ js/       # File JS cho hiệu ứng và tương tác
+
 │  ├─ images/   # Hình ảnh dùng trong app
+
 │  └─ icons/    # Icon dễ thương cho giao diện
+
 ├─ dashboard.php # Trang thống kê và quản lý thói quen
+
 ├─ index.php     # Trang onboarding trực quan
+
 ├─ dangnhap.php  # Trang đăng nhập
+
 ├─ dangky.php    # Trang đăng ký
+
 ├─ logout.php    # Trang đăng xuất
+
 ├─ config.php    # File cấu hình cơ sở dữ liệu
+
 └─ README.md     # File hướng dẫn này
 
 ## 🚀 Hướng dẫn cài đặt
