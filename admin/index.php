@@ -11,43 +11,8 @@
 </head>
 
 <body class="bg-gradient-to-tr from-cyan-300 to-sky-400">
-
 <!-- NAV -->
-<nav class="flex justify-between px-8 py-3 items-center bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg">
-    <div class="flex items-center gap-3">
-        <img style="border-radius: 60%" src="assets/images/logo_habitu.png" width="38">
-        <h2 class="text-xl font-bold">Habitu <span class="bg-yellow-400 text-black px-2 py-0.5 rounded text-sm ml-2">ADMIN</span></h2>
-    </div>
-
-    <ul class="flex gap-8 font-medium">
-        <li class="flex items-center gap-1">
-            <i class="fas fa-tachometer-alt"></i>
-            <a href="index.php" class="hover:text-yellow-300 transition">Dashboard</a>
-        </li>
-        <li class="flex items-center gap-1">
-            <i class="fas fa-user"></i>
-            <a href="users.php" class="hover:text-yellow-300 transition">Người Dùng</a>
-        </li>
-        <li class="flex items-center gap-1">
-            <i class="fas fa-file-alt"></i>
-            <a href="post.php" class="hover:text-yellow-300 transition">Bài Viết</a>
-        </li>
-        <li class="flex items-center gap-1">
-            <i class="fas fa-redo"></i>
-            <a href="#" class="hover:text-yellow-300 transition">Thói Quen</a>
-        </li>
-        <li class="flex items-center gap-1">
-            <i class="fas fa-cog"></i>
-            <a href="#" class="hover:text-yellow-300 transition">Cài Đặt</a>
-        </li>
-    </ul>
-
-    <div class="flex items-center gap-2">
-        <i class="fas fa-user-circle text-xl"></i>
-        <span>Admin</span>
-    </div>
-</nav>
-
+<?php include "navbar.php"; ?>
 
 <!-- MAIN CONTENT -->
 <div class="px-10 py-5 text-gray-800">

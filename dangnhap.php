@@ -36,9 +36,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $popup = "Đăng nhập thành công!";
             $success = true;
 
-            // Chuyển đến onboarding (index.php)
-    header("Location: index.php");
-    exit();
+             // PHÂN QUYỀN TẠI ĐÂY
+    if ($user["role"] === "admin") {
+        header("Location: admin/index.php");
+        exit();
+    } else {
+        header("Location: index.php");
+        exit();
+    }
         }
     } catch (PDOException $e) {
         $popup = "Lỗi: " . $e->getMessage();

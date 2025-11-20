@@ -2,7 +2,7 @@
 include "../config.php";// kết nối DB
 
 // gán user_id cho thói quen mẫu
-$user_id = 2; // hoặc user_id System có sẵn trong bảng user
+$user_id = 17; // hoặc user_id System có sẵn trong bảng user
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_habit'])) {
     $name = $_POST['name'];
@@ -218,10 +218,15 @@ document.addEventListener('click', function(e){
 
 echo "<td>{$row['status']}</td>";
 echo "<td>";
-if ($row['user_id'] == 1) {
+if ($row['user_id'] == 17) {
     echo "System";
 } else {
-    echo "Người dùng"; // hoặc truy vấn tên người dùng nếu muốn
+    // Lấy tên người dùng theo user_id
+    $stmtUser = $pdo->prepare("SELECT username FROM users WHERE user_id = ?");
+    $stmtUser->execute([$row['user_id']]);
+    $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+    echo $user ? $user['username'] : "Không tìm thấy";
 }
 echo "</td>";
                 echo "<td>---</td>";
