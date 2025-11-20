@@ -73,5 +73,10 @@ $username = $_SESSION["username"];
   </div>
 
   <script src="./assets/js/onboarding.js"></script>
+  <script>
+  document.getElementById("closeBtn").addEventListener("click", function () {
+    window.location.href = "dashboard.php"; // đổi thành file dashboard của bé
+  });
+</script>
 </body>
 </html>

@@ -56,10 +56,14 @@
 
     <!-- Section 3: Thông tin Ứng dụng -->
     <div class="bg-white shadow rounded-lg p-5">
-        <h2 class="text-xl font-semibold mb-3">Thông tin Ứng dụng</h2>
+        <h2 class="text-xl font-semibold mb-3">Thông tin Website</h2>
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-gray-700 mb-1">Tên ứng dụng</label>
+                <label class="block text-gray-700 mb-1">Tên website</label>
+                <input type="text" class="w-full border border-gray-300 px-3 py-2 rounded" value="Habitu">
+            </div>
+             <div>
+                <label class="block text-gray-700 mb-1">Mô tả</label>
                 <input type="text" class="w-full border border-gray-300 px-3 py-2 rounded" value="Habitu">
             </div>
             <div>
