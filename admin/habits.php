@@ -413,6 +413,27 @@ editForm.addEventListener('submit', function(e){
     }).then(res => res.text())
       .then(data => location.reload());
 });
+
+// --- nút xoá ---
+document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const habitId = btn.dataset.id;
+        if(confirm("Bạn có chắc chắn muốn xoá thói quen này?")) {
+            fetch('delete_habit.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `habit_id=${habitId}`
+            })
+            .then(res => res.text())
+            .then(data => {
+                // Xoá dòng trong bảng ngay lập tức
+                const row = btn.closest('tr');
+                row.remove();
+            });
+        }
+    });
+});
+
 </script>
 
 </body>

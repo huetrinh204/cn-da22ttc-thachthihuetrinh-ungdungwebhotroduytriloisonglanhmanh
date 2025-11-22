@@ -1,13 +1,10 @@
 <?php
 include "../config.php";
 
-if (isset($_GET["id"])) {
-    $id = $_GET["id"];
-
-    $stmt = $pdo->prepare("DELETE FROM habit WHERE id=? LIMIT 1");
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['habit_id'])) {
+    $id = $_POST['habit_id'];
+    $stmt = $pdo->prepare("DELETE FROM habit WHERE habit_id=?");
     $stmt->execute([$id]);
-
-    header("Location: habits.php");
-    exit;
+    echo "OK";
 }
 ?>
