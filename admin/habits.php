@@ -66,6 +66,25 @@ if(isset($_GET['search']) && !empty($_GET['search'])){
 <!-- NAV -->
 <?php include "navbar.php"; ?>
 
+<?php
+// Tổng thói quen (tất cả)
+$stmtTotal = $pdo->query("SELECT COUNT(*) AS total_habits FROM habit");
+$totalHabits = $stmtTotal->fetch(PDO::FETCH_ASSOC)['total_habits'];
+
+// Thói quen mẫu (status = 'Mẫu')
+$stmtSample = $pdo->query("SELECT COUNT(*) AS sample_habits FROM habit WHERE status='Mẫu'");
+$sampleHabits = $stmtSample->fetch(PDO::FETCH_ASSOC)['sample_habits'];
+
+// Tổng người dùng
+$stmtUsers = $pdo->query("SELECT COUNT(*) AS total_users FROM users");
+$totalUsers = $stmtUsers->fetch(PDO::FETCH_ASSOC)['total_users'];
+
+// Tổng hoàn thành (giả sử có bảng track hoàn thành habit)
+// Nếu em chưa có bảng track, tạm thời set 0
+//$stmtCompleted = $pdo->query("SELECT COUNT(*) AS total_completed FROM habit_completed");
+//$totalCompleted = $stmtCompleted->fetch(PDO::FETCH_ASSOC)['total_completed'] ?? 0;
+?>
+
 <!-- Tổng quan -->
 <div class="px-10 py-5">
     <h1 class="text-3xl font-bold" style="color:#ffffff; text-shadow:2px 2px 6px rgba(0,0,0,0.5)">Quản Lý Thói Quen</h1>
@@ -75,19 +94,19 @@ if(isset($_GET['search']) && !empty($_GET['search'])){
     <div class="grid grid-cols-4 gap-6 mb-6">
         <div class="bg-white shadow rounded-lg p-5 text-center">
             <p class="text-gray-500">Tổng thói quen</p>
-            <h2 class="text-3xl font-bold text-blue-600">8</h2>
+            <h2 class="text-3xl font-bold text-blue-600"><?php echo $totalHabits; ?></h2>
         </div>
         <div class="bg-white shadow rounded-lg p-5 text-center">
             <p class="text-gray-500">Thói quen mẫu</p>
-            <h2 class="text-3xl font-bold text-green-600">5</h2>
+            <h2 class="text-3xl font-bold text-green-600"><?php echo $sampleHabits; ?></h2>
         </div>
         <div class="bg-white shadow rounded-lg p-5 text-center">
             <p class="text-gray-500">Tổng người dùng</p>
-            <h2 class="text-3xl font-bold text-orange-500">16.955</h2>
+            <h2 class="text-3xl font-bold text-orange-500"><?php echo $totalUsers; ?></h2>
         </div>
         <div class="bg-white shadow rounded-lg p-5 text-center">
             <p class="text-gray-500">Tổng hoàn thành</p>
-            <h2 class="text-3xl font-bold text-red-600">227.266</h2>
+            <h2 class="text-3xl font-bold text-red-600">Updating</h2>
         </div>
     </div>
 
