@@ -39,6 +39,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['habit_id'])){
     $stmt->execute([$name, $desc, $icon, $id]);
     exit;
 }
+
+//Tìm kiếm thói quen
+ $search = '';
+if(isset($_GET['search']) && !empty($_GET['search'])){
+    $search = "%".$_GET['search']."%";
+    $stmt = $pdo->prepare("SELECT * FROM habit WHERE habit_name LIKE ? ORDER BY created_hb DESC");
+    $stmt->execute([$search]);
+} else {
+    $stmt = $pdo->query("SELECT * FROM habit ORDER BY created_hb DESC");
+}
 ?>
 
 
@@ -81,22 +91,34 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['habit_id'])){
         </div>
     </div>
 
-    <!-- Search + Filter -->
-    <div class="flex flex-wrap gap-4 mb-6 items-center">
-        <input type="text" placeholder="🔍 Tìm kiếm thói quen..."
-               class="border border-gray-300 px-4 py-2 rounded-lg w-1/2 focus:outline-none">
-        <button class="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded">Tất cả</button>
-        <button class="bg-yellow-200 hover:bg-yellow-300 px-3 py-1 rounded">Mẫu</button>
-        <button class="bg-green-200 hover:bg-green-300 px-3 py-1 rounded">Hoạt động</button>
-       
+
+<!-- Search + Tạo Thói Quen Mẫu -->
+<div class="flex flex-wrap gap-4 mb-6 items-center justify-between">
+    <!-- Form tìm kiếm -->
+   <form method="GET" class="flex gap-2 mb-6 items-center w-full">
+    <input type="text" name="search" 
+       placeholder="🔍 Tìm kiếm thói quen..." 
+       class="border border-gray-300 px-4 py-2 rounded-l-lg flex-1 focus:outline-none"
+       value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+           
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition">
+        <i class="ri-search-line"></i> Tìm
+    </button>
+
+    <a href="habits.php" class="bg-gray-200 px-4 py-2 rounded ml-2 hover:bg-gray-300 transition">
+        Tất cả
+    </a>
+
+    <button id="createHabitBtn" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded ml-auto">
+        + Tạo Thói Quen Mẫu
+    </button>
+</form>
 
 
+</div>
 
-    <!-- Nút Tạo Thói Quen Mẫu -->
-<button id="createHabitBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded ml-auto">
-    + Tạo Thói Quen Mẫu
-</button>
-    </div>
+    
+    
 
 <!-- Popup Form -->
 <div id="createHabitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
@@ -306,7 +328,7 @@ document.addEventListener('click', function(e){
         </thead>
         <tbody>
         <?php
-            $stmt = $pdo->query("SELECT * FROM habit ORDER BY created_hb DESC");
+            
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr class='border-b hover:bg-gray-50'>";
              echo "<td class='flex items-center gap-2 py-2'>
@@ -434,6 +456,9 @@ document.querySelectorAll('.delete-btn').forEach(btn => {
         }
     });
 });
+
+
+//Tìm kiếm thói quen
 
 </script>
 
