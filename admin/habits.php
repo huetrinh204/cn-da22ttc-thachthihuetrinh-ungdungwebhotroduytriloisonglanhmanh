@@ -19,6 +19,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_habit'])) {
     header("Location: habits.php");
     exit;
 }
+
+// Xoá
+if(isset($_GET['delete_id'])){
+    $id = $_GET['delete_id'];
+    $stmt = $pdo->prepare("DELETE FROM habit WHERE id=? LIMIT 1");
+    $stmt->execute([$id]);
+    exit;
+}
+
+// Cập nhật từ popup edit
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['habit_id'])){
+    $id = $_POST['habit_id'];
+    $name = $_POST['habit_name'];
+    $desc = $_POST['description'];
+    $icon = $_POST['icon'];
+
+    $stmt = $pdo->prepare("UPDATE habit SET habit_name=?, description=?, icon=? WHERE id=?");
+    $stmt->execute([$name, $desc, $icon, $id]);
+    exit;
+}
 ?>
 
 
@@ -191,6 +211,83 @@ document.addEventListener('click', function(e){
 });
 </script>
 
+<!-- Popup Edit Habit -->
+<div id="editHabitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-2xl shadow-2xl w-11/12 md:w-1/2 p-6 relative">
+        <!-- Header -->
+        <div class="mb-4 p-4 rounded-t-2xl bg-gradient-to-r from-blue-400 to-cyan-500 text-white font-bold text-xl flex justify-between items-center">
+            Chỉnh sửa Thói Quen
+            <button id="closeEditModalBtn" class="text-white text-2xl font-bold hover:text-gray-200">&times;</button>
+        </div>
+
+        <form id="editHabitForm" method="POST" action="update_habit.php" class="space-y-4">
+            <input type="hidden" name="habit_id" id="edit_habit_id">
+
+            <!-- Tên thói quen -->
+            <div>
+                <label class="block font-medium mb-1">Tên Thói Quen</label>
+                <input name="habit_name" id="edit_habit_name" type="text" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400" required>
+            </div>
+
+            <!-- Mô tả -->
+            <div>
+                <label class="block font-medium mb-1">Mô tả</label>
+                <textarea name="description" id="edit_description" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400" required></textarea>
+            </div>
+
+            <!-- Chọn Icon -->
+            <div class="relative">
+                <label class="block font-medium mb-1">Chọn Icon</label>
+                <input id="edit_iconInput" type="text" readonly placeholder="Chọn icon..." 
+                       class="w-full border border-gray-300 px-3 py-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400" required>
+
+                <div id="edit_iconGrid" class="absolute top-full left-0 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-2 grid grid-cols-5 gap-2 hidden max-h-48 overflow-y-auto z-50">
+                    <!-- Copy 25 icon từ form tạo thói quen -->
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">💧</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🏃</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">📚</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🧘</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">😴</div>
+
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🗣️</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">💰</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">📝</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🎧</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🎨</div>
+
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">📖</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">⚽</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🏊</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🚴</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🥗</div>
+
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🍎</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🧩</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🖋️</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🎹</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🎬</div>
+
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🎯</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🛌</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">📅</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🧹</div>
+                    <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">💻</div>
+                </div>
+
+                <input type="hidden" name="icon" id="edit_selectedIcon">
+            </div>
+
+            <!-- Nút cập nhật -->
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" id="closeEditModalBtn2" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">Hủy</button>
+                <button type="submit" class="px-5 py-2 rounded-full bg-gradient-to-r from-blue-400 to-cyan-500 text-white font-semibold shadow-lg hover:from-blue-500 hover:to-cyan-600 transition">Cập nhật</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
 
 <!-- Habits Table -->
    <div class="bg-white shadow rounded-lg p-5 overflow-x-auto">
@@ -232,18 +329,91 @@ echo "</td>";
                 echo "<td>---</td>";
                 echo "<td>---</td>";
                 echo "<td>---</td>";
-                echo "<td class='text-center text-lg'>
-                        <i class='ri-edit-2-line text-blue-500 cursor-pointer mx-1'></i>
-                        <i class='ri-delete-bin-6-line text-red-500 cursor-pointer mx-1'></i>
-                      </td>";
+               echo "<td class='text-center text-lg'>
+    <!-- Nút chỉnh sửa -->
+    <button class='edit-btn text-blue-500 mx-1' 
+            data-id='{$row['habit_id']}' 
+            data-name='".htmlspecialchars($row['habit_name'], ENT_QUOTES)."' 
+            data-desc='".htmlspecialchars($row['description'], ENT_QUOTES)."' 
+            data-icon='".htmlspecialchars($row['icon'], ENT_QUOTES)."'>
+        <i class='ri-edit-2-line cursor-pointer'></i>
+    </button>
+
+    <!-- Nút xoá -->
+    <button class='delete-btn text-red-500 mx-1' data-id='{$row['habit_id']}'>
+        <i class='ri-delete-bin-6-line cursor-pointer'></i>
+    </button>
+</td>";
                 echo "</tr>";
             }
         ?>
         </tbody>
     </table>
 
-    </div>
+   </div>
 </div>
+
+<script>
+// --- mở popup chỉnh sửa ---
+const editHabitModal = document.getElementById('editHabitModal');
+const closeEditBtn = document.getElementById('closeEditModalBtn');
+const closeEditBtn2 = document.getElementById('closeEditModalBtn2');
+const editForm = document.getElementById('editHabitForm');
+const edit_iconInput = document.getElementById('edit_iconInput');
+const edit_iconGrid = document.getElementById('edit_iconGrid');
+const edit_selectedIcon = document.getElementById('edit_selectedIcon');
+
+// Mở popup khi nhấn nút edit
+document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('edit_habit_id').value = btn.dataset.id;
+        document.getElementById('edit_habit_name').value = btn.dataset.name;
+        document.getElementById('edit_description').value = btn.dataset.desc;
+        document.getElementById('edit_iconInput').value = btn.dataset.icon;
+        document.getElementById('edit_selectedIcon').value = btn.dataset.icon;
+
+        editHabitModal.classList.remove('hidden');
+    });
+});
+
+// Đóng popup
+closeEditBtn.addEventListener('click', () => editHabitModal.classList.add('hidden'));
+closeEditBtn2.addEventListener('click', () => editHabitModal.classList.add('hidden'));
+
+// Chọn icon
+edit_iconInput.addEventListener('click', () => edit_iconGrid.classList.toggle('hidden'));
+
+edit_iconGrid.querySelectorAll('div').forEach(div => {
+    div.addEventListener('click', () => {
+        edit_selectedIcon.value = div.textContent;
+        edit_iconInput.value = div.textContent;
+        edit_iconGrid.classList.add('hidden');
+
+        // Highlight icon
+        edit_iconGrid.querySelectorAll('div').forEach(d => d.classList.remove('bg-blue-200'));
+        div.classList.add('bg-blue-200');
+    });
+});
+
+// Click ngoài để ẩn grid
+document.addEventListener('click', function(e){
+    if (!edit_iconInput.contains(e.target) && !edit_iconGrid.contains(e.target)){
+        edit_iconGrid.classList.add('hidden');
+    }
+});
+
+// --- submit form AJAX để update ---
+editForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const formData = new FormData(editForm);
+
+    fetch('update_habit.php', {
+        method: 'POST',
+        body: formData
+    }).then(res => res.text())
+      .then(data => location.reload());
+});
+</script>
 
 </body>
 </html>
