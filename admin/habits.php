@@ -128,9 +128,9 @@ $totalUsers = $stmtUsers->fetch(PDO::FETCH_ASSOC)['total_users'];
         Tất cả
     </a>
 
-    <button id="createHabitBtn" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded ml-auto">
-        + Tạo Thói Quen Mẫu
-    </button>
+   <button id="createHabitBtn" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded ml-auto font-bold">
+    + Tạo Thói Quen Mẫu
+</button>
 </form>
 
 
@@ -345,51 +345,53 @@ document.addEventListener('click', function(e){
                 <th class="text-center">Hành động</th>
             </tr>
         </thead>
-        <tbody>
-        <?php
-            
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                echo "<tr class='border-b hover:bg-gray-50'>";
-             echo "<td class='flex items-center gap-2 py-2'>
-        <div class='w-8 h-8 bg-blue-400 text-white rounded-full flex items-center justify-center font-bold' style='font-family: \"Segoe UI Emoji\", \"Apple Color Emoji\", \"Noto Color Emoji\", sans-serif;'>{$row['icon']}</div>
-        {$row['habit_name']}
-      </td>";
+      <tbody>
+<?php
+$habits = $stmt->fetchAll(PDO::FETCH_ASSOC); // lấy tất cả kết quả
 
-echo "<td>{$row['description']}</td>";
-echo "<td>";
-if ($row['user_id'] == 17) {
-    echo "System";
+if(count($habits) > 0){
+    foreach($habits as $row){
+        echo "<tr class='border-b hover:bg-gray-50'>";
+        echo "<td class='flex items-center gap-2 py-2'>
+                <div class='w-8 h-8 bg-blue-400 text-white rounded-full flex items-center justify-center font-bold' 
+                     style='font-family: \"Segoe UI Emoji\", \"Apple Color Emoji\", \"Noto Color Emoji\", sans-serif;'>{$row['icon']}</div>
+                {$row['habit_name']}
+              </td>";
+        echo "<td>{$row['description']}</td>";
+        echo "<td>";
+        if ($row['user_id'] == 17) {
+            echo "System";
+        } else {
+            $stmtUser = $pdo->prepare("SELECT username FROM users WHERE user_id = ?");
+            $stmtUser->execute([$row['user_id']]);
+            $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+            echo $user ? $user['username'] : "Không tìm thấy";
+        }
+        echo "</td>";
+        echo "<td>---</td>";
+        echo "<td>---</td>";
+        echo "<td>---</td>";
+        echo "<td class='text-center text-lg'>
+                <button class='edit-btn text-blue-500 mx-1' 
+                        data-id='{$row['habit_id']}' 
+                        data-name='".htmlspecialchars($row['habit_name'], ENT_QUOTES)."' 
+                        data-desc='".htmlspecialchars($row['description'], ENT_QUOTES)."' 
+                        data-icon='".htmlspecialchars($row['icon'], ENT_QUOTES)."'>
+                    <i class='ri-edit-2-line cursor-pointer'></i>
+                </button>
+                <button class='delete-btn text-red-500 mx-1' data-id='{$row['habit_id']}'>
+                    <i class='ri-delete-bin-6-line cursor-pointer'></i>
+                </button>
+              </td>";
+        echo "</tr>";
+    }
 } else {
-    // Lấy tên người dùng theo user_id
-    $stmtUser = $pdo->prepare("SELECT username FROM users WHERE user_id = ?");
-    $stmtUser->execute([$row['user_id']]);
-    $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+    echo "<tr><td colspan='7' class='text-center py-4 text-gray-700 italic'>Oops! Hiện tại chưa có thói quen này 😅</td></tr>";
 
-    echo $user ? $user['username'] : "Không tìm thấy";
 }
-echo "</td>";
-                echo "<td>---</td>";
-                echo "<td>---</td>";
-                echo "<td>---</td>";
-               echo "<td class='text-center text-lg'>
-    <!-- Nút chỉnh sửa -->
-    <button class='edit-btn text-blue-500 mx-1' 
-            data-id='{$row['habit_id']}' 
-            data-name='".htmlspecialchars($row['habit_name'], ENT_QUOTES)."' 
-            data-desc='".htmlspecialchars($row['description'], ENT_QUOTES)."' 
-            data-icon='".htmlspecialchars($row['icon'], ENT_QUOTES)."'>
-        <i class='ri-edit-2-line cursor-pointer'></i>
-    </button>
+?>
+</tbody>
 
-    <!-- Nút xoá -->
-    <button class='delete-btn text-red-500 mx-1' data-id='{$row['habit_id']}'>
-        <i class='ri-delete-bin-6-line cursor-pointer'></i>
-    </button>
-</td>";
-                echo "</tr>";
-            }
-        ?>
-        </tbody>
     </table>
 
    </div>
