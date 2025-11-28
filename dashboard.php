@@ -19,7 +19,7 @@ $username = $_SESSION["username"];
 
 /* ==================== LẤY DANH SÁCH THÓI QUEN ==================== */
 $stmt = $pdo->prepare("
-    SELECT * FROM habit 
+      SELECT *, 0 AS current_streak  FROM habit 
     WHERE status='Mẫu' OR (status='Người dùng' AND user_id=:user_id) 
     ORDER BY created_hb DESC
 ");
@@ -102,7 +102,24 @@ $habit_logs = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // habit_id => completed
 
 $completed_today = count(array_filter($habit_logs, fn($c)=>$c=='done'));
 
+
+/*====================== TỔNG CHUỖI NGÀY ======================= */ 
+
+// Lấy tổng chuỗi ngày của user: tính max streak trong bảng habit_logs
+$total_streak = 0;
+
+foreach ($habits as $hb) {
+    $stmt = $pdo->prepare("
+        SELECT current_streak 
+        FROM habit 
+        WHERE habit_id=? AND (status='Người dùng' AND user_id=?)
+    ");
+    $stmt->execute([$hb['habit_id'], $user_id]);
+    $streak = $stmt->fetchColumn();
+    $total_streak += $streak ? (int)$streak : 0;
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -144,7 +161,8 @@ $completed_today = count(array_filter($habit_logs, fn($c)=>$c=='done'));
     <img style="border-radius:60%;width:50px;height:50px;" src="assets/icons/streak.png" alt="icon">
     <div>
       <h3 class="font-semibold">Tổng chuỗi ngày</h3>
-      <p class="text-lg font-bold">15 ngày</p>
+    <p class="text-lg font-bold" id="totalStreak"><?= $total_streak ?> ngày</p>
+
     </div>
   </div>
 </section>
@@ -180,9 +198,8 @@ $completed_today = count(array_filter($habit_logs, fn($c)=>$c=='done'));
 
         <!-- Chuỗi streak -->
         <div class="streak text-orange-400 font-semibold ml-auto mr-3">
-            <?= $hb['current_streak'] ?> ngày
-        </div>
-
+    <?= isset($hb['current_streak']) ? $hb['current_streak'] : 0 ?> ngày
+</div>
         <!-- Nút sửa / xoá -->
         <div class="flex gap-2">
             <!-- Nút sửa -->
@@ -413,6 +430,7 @@ $completed_today = count(array_filter($habit_logs, fn($c)=>$c=='done'));
   </div>
 
 </footer>
+
 <script>
 const createBtn = document.getElementById('addHabitBtn');
 const modal = document.getElementById('createHabitModal');
@@ -474,7 +492,7 @@ function closeEditModal() {
 document.querySelectorAll('.habit-checkbox').forEach(cb => {
     cb.addEventListener('change', function() {
         const habitId = this.dataset.habitId;
-        const completed = this.checked ? 'done' : 'missed'; // ENUM
+        const completed = this.checked ? 'done' : 'missed';
 
         fetch('update_habit_log.php', {
             method: 'POST',
@@ -484,22 +502,44 @@ document.querySelectorAll('.habit-checkbox').forEach(cb => {
         .then(res => res.json())
         .then(data => {
             if(data.success){
+                // Update streak của thói quen
+                const streakEl = this.closest('.habit-item').querySelector('.streak');
+                streakEl.textContent = data.current_streak + ' ngày';
+
+                // Update tổng chuỗi ngày
+                document.getElementById('totalStreak').textContent = data.total_streak + ' ngày';
+
+                // Update completed hôm nay và %
                 const completedEl = document.getElementById('completedToday');
                 const percentEl = document.getElementById('completedPercent');
-                let current = parseInt(completedEl.textContent);
-                const total = <?= $total_habits ?>;
+                completedEl.textContent = data.completed_today;
+                percentEl.textContent = data.total_habits ? Math.round(data.completed_today / data.total_habits * 100) : 0;
 
-                current = this.checked ? current + 1 : Math.max(0, current - 1);
-                completedEl.textContent = current;
-                percentEl.textContent = total ? Math.round(current / total * 100) : 0;
+                // Hiển thị thông báo 100% nếu đạt đủ
+                if(data.completed_today === data.total_habits){
+                    const msg = document.getElementById('congratsMessage');
+                    const audio = document.getElementById('celebrationSound');
+                    if(msg){
+                        msg.style.display = 'block';
+                        audio.currentTime = 0;
+                        audio.play();
+                        setTimeout(()=>{msg.style.display='none';},3000);
+                    }
+                }
             }
         });
     });
 });
-  
+
+
+
+
+
 
 </script>
 
 <script src="./assets/js/dashboard.js"></script>
+
 </body>
+
 </html>
