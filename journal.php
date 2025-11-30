@@ -6,7 +6,9 @@ if (!isset($_SESSION["user_id"])) {
 }
 include "config.php";
 
+// Lấy user_id & username
 $user_id = $_SESSION["user_id"];
+$username = $_SESSION["username"];
 
 // Thêm nhật ký mới
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['title'])){
