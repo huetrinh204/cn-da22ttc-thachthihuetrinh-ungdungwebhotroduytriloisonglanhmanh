@@ -223,7 +223,7 @@ input[type="password"] {
     popupText.innerText = "<?= $popup ?>";
     popup.style.display = "flex";
     <?php if($success): ?>
-      setTimeout(function(){ window.location.href='index.html'; }, 1000);
+      setTimeout(function(){ window.location.href='index.php'; }, 1000);
     <?php endif; ?>
   <?php endif; ?>
 </script>
