@@ -1,280 +1,309 @@
 <?php
 session_start();
+include "config.php";
 
-// Nếu chưa đăng nhập → chuyển về trang đăng nhập
+// Nếu chưa đăng nhập
 if (!isset($_SESSION["user_id"])) {
     header("Location: dangnhap.php");
     exit();
 }
 
-// Lấy username từ session
+$user_id = $_SESSION["user_id"];
 $username = $_SESSION["username"];
-?>
 
+/* ============================================
+   API MODE – tất cả xử lý backend trong 1 file
+   ============================================ */
+if (isset($_GET["action"])) {
+
+    header("Content-Type: application/json; charset=UTF-8");
+
+    /* ------------------- ĐĂNG BÀI ------------------- */
+    if ($_GET["action"] === "create_post") {
+        $content = trim($_POST["content"]);
+
+        if ($content == "") {
+            echo json_encode(["status" => "empty"]);
+            exit();
+        }
+
+        $stmt = $conn->prepare("
+            INSERT INTO post (title, content, created_at, user_id)
+            VALUES ('', ?, NOW(), ?)
+        ");
+        $stmt->bind_param("si", $content, $user_id);
+        $stmt->execute();
+
+        echo json_encode(["status" => "success"]);
+        exit();
+    }
+
+    /* ------------------- THÊM COMMENT ------------------- */
+if ($_GET["action"] === "create_comment") {
+    $post_id = $_POST["post_id"];
+    $content = $_POST["content"];
+
+    $stmt = $conn->prepare("INSERT INTO comment (post_id, user_id, content_cmt) VALUES (?, ?, ?)");
+    $stmt->bind_param("iis", $post_id, $user_id, $content);
+
+    if ($stmt->execute()) {
+        echo json_encode(["status" => "success"]);
+    } else {
+        echo json_encode(["status" => "error"]);
+    }
+    exit();
+}
+
+    /* ------------------- LẤY LIST POST ------------------- */
+    if ($_GET["action"] === "get_posts") {
+
+        $sql = "
+            SELECT p.*, u.username 
+            FROM post p
+            JOIN users u ON p.user_id = u.user_id
+            ORDER BY p.post_id DESC
+        ";
+
+        $result = $conn->query($sql);
+        $posts = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $pid = $row["post_id"];
+
+            // lấy comments
+            $cmt = $conn->query("
+                SELECT c.content_cmt, c.created_cmt, u.username
+                FROM comment c
+                JOIN users u ON c.user_id = u.user_id
+                WHERE c.post_id = $pid
+                ORDER BY c.cmt_id ASC
+            ");
+
+            $comments = [];
+            while ($c = $cmt->fetch_assoc()) {
+                $comments[] = $c;
+            }
+
+            $row["comments"] = $comments;
+            $posts[] = $row;
+        }
+
+        echo json_encode($posts);
+        exit();
+    }
+
+    exit();
+}
+
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<meta charset="UTF-8">
+<title>Cộng đồng</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <style>
-    /* Animation cho popup */
-    .popup-enter {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    .popup-enter-active {
-      opacity: 1;
-      transform: scale(1);
-      transition: all 0.25s ease-out;
-    }
-    .popup-exit {
-      opacity: 1;
-      transform: scale(1);
-    }
-    .popup-exit-active {
-      opacity: 0;
-      transform: scale(0.9);
-      transition: all 0.2s ease-in;
-    }
-  </style>
+<style>
+.popup-enter { opacity:0; transform:scale(0.95); }
+.popup-enter-active { opacity:1; transform:scale(1); transition:0.25s; }
+.popup-exit-active { opacity:0; transform:scale(0.9); transition:0.2s; }
+</style>
 </head>
 
 <body class="bg-gradient-to-br from-cyan-300 to-teal-400 min-h-screen">
 
 <?php include "navbar.php"; ?>
 
-<!-- MAIN CONTENT -->
 <section class="container mx-auto mt-10 px-4">
+<div class="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-xl max-w-4xl mx-auto">
 
-  <!-- MAIN CARD -->
-  <div class="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-xl max-w-4xl mx-auto">
-
-    <h2 class="text-xl font-semibold text-teal-700">Cộng Đồng Mèo Thói Quen</h2>
-    <p class="text-gray-700 mb-4">
-      Chia sẻ hành trình và động viên nhau xây dựng thói quen lành mạnh 🐾✨
-    </p>
+    <h2 class="text-xl font-semibold text-teal-700 mb-2">Cộng Đồng Mèo Thói Quen</h2>
 
     <!-- FORM ĐĂNG BÀI -->
-    <div class="mb-6">
-      <textarea
-        placeholder="Chia sẻ câu chuyện của bạn..."
-        class="w-full h-32 border border-teal-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-teal-400 bg-gray-50">
-      </textarea>
+   <textarea id="createPostInput"
+  placeholder="Chia sẻ câu chuyện của bạn..."
+  class="w-full h-32 border border-teal-300 rounded-xl p-3 bg-gray-50"></textarea>
 
-      <button class="mt-3 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md flex items-center gap-2">
-        <i class="fa-solid fa-paper-plane"></i> Đăng Bài
-      </button>
-    </div>
+<button onclick="submitPost()"
+  class="mt-3 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md flex items-center gap-2">
+  <i class="fa-solid fa-paper-plane"></i> Đăng Bài
+</button>
 
-    <!-- BÀI VIẾT DEMO -->
-    <div class="bg-white rounded-2xl shadow p-5 border cursor-pointer"
-         onclick="openPostDetail()">
+    <hr class="my-6">
 
-      <div class="flex gap-3">
-        <img src="assets/icons/avatar1.png" class="w-12 h-12 rounded-full border">
+    <!-- Danh sách bài -->
+  <div id="postContainer"></div>
 
-        <div>
-          <h4 class="font-semibold">Minh Anh</h4>
-          <p class="text-gray-500 text-sm">2 giờ trước</p>
-        </div>
-      </div>
-
-      <p class="mt-3 text-gray-800 leading-relaxed">
-        Mình đã hoàn thành 30 ngày liên tục tập thể dục! Cảm giác thật tuyệt vời 💪✨
-      </p>
-
-      <div class="flex gap-6 mt-4 text-gray-600">
-        <span class="flex items-center gap-1"><i class="fa-regular fa-heart"></i> 24</span>
-        <span class="flex items-center gap-1"><i class="fa-regular fa-comment"></i> 1</span>
-      </div>
-
-    </div>
-
-  </div>
-
+</div>
 </section>
 
-
-
-<!-- POPUP XEM BÀI CHI TIẾT -->
+<!-- POPUP -->
 <div id="postDetailPopup"
-     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden justify-center items-center p-4 z-50">
+     class="fixed inset-0 bg-black/40 hidden justify-center items-center p-4 z-50">
 
   <div id="postDetailCard"
        class="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 popup-enter">
 
-    <!-- Header -->
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-semibold text-gray-800">Bài viết</h3>
-      <button onclick="closePostDetail()" class="text-gray-500 text-2xl hover:text-black">×</button>
+      <h3 class="text-xl font-semibold">Bài viết</h3>
+      <button onclick="closePostDetail()" class="text-gray-700 text-2xl">×</button>
     </div>
 
-    <!-- Author Info -->
-    <div class="flex gap-3 items-center mb-4">
-      <img id="detailAvatar" src="" class="w-12 h-12 rounded-full border">
+    <div class="flex gap-3 mb-4">
+      <img id="detailAvatar" src="assets/icons/avatar1.png" class="w-12 h-12 rounded-full">
       <div>
-        <h4 id="detailName" class="font-semibold text-gray-800"></h4>
+        <h4 id="detailName" class="font-semibold"></h4>
         <p id="detailTime" class="text-gray-500 text-sm"></p>
       </div>
     </div>
 
-    <!-- Content -->
-    <p id="detailContent" class="text-gray-800 leading-relaxed mb-4"></p>
+    <p id="detailContent" class="mb-4"></p>
 
-    <!-- Reaction -->
-    <div class="flex gap-6 text-gray-600 mb-6">
-      <span class="flex items-center gap-1"><i class="fa-regular fa-heart"></i> <span id="detailLikes">0</span></span>
-      <span class="flex items-center gap-1"><i class="fa-regular fa-comment"></i> <span id="detailCommentsCount">0</span></span>
+    <div class="mb-4">
+      <span><i class="fa-regular fa-comment"></i> <span id="detailCommentsCount"></span> bình luận</span>
     </div>
 
-    <!-- Comment List -->
-    <div id="commentList" class="space-y-3 max-h-56 overflow-y-auto pr-2"></div>
+    <div id="commentList" class="max-h-56 overflow-y-auto space-y-3"></div>
 
-    <!-- Write Comment -->
-    <div class="mt-4">
-      <textarea id="commentInput"
-                placeholder="Viết bình luận..."
-                class="w-full border border-gray-300 rounded-lg p-3 h-20 focus:ring-2 focus:ring-teal-400"></textarea>
+    <textarea id="commentInput"
+        placeholder="Viết bình luận..."
+        class="w-full border p-3 rounded-lg mt-4"></textarea>
 
-      <button onclick="addComment()"
-        class="mt-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md shadow">
+    <button onclick="addComment()"
+        class="mt-2 px-4 py-2 bg-teal-500 text-white rounded-md">
         Gửi bình luận
-      </button>
-    </div>
+    </button>
 
   </div>
 </div>
 
+<?php include "footer.php"; ?>
 
-<!-- FOOTER -->
-<footer class="mt-10 bg-gradient-to-r from-purple-600 to-pink-500 text-white py-10 px-8 rounded-t-3xl">
-
-  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
-
-    <!-- Logo + mô tả -->
-    <div>
-      <div class="flex items-center gap-3 mb-3">
-        <img src="assets/logo_habitu.png" width="40" class="rounded-full" />
-        <h2 class="text-xl font-bold">Habitu</h2>
-      </div>
-      <p class="text-sm leading-relaxed">
-        Xây dựng thói quen lành mạnh cùng Habitu! 🐱✨
-      </p>
-
-      <!-- Social icons -->
-      <div class="flex gap-4 mt-4 text-xl">
-        <a href="#" class="hover:text-yellow-300"><i class="fab fa-facebook"></i></a>
-        <a href="#" class="hover:text-yellow-300"><i class="fab fa-twitter"></i></a>
-        <a href="#" class="hover:text-yellow-300"><i class="fab fa-instagram"></i></a>
-        <a href="#" class="hover:text-yellow-300"><i class="fab fa-youtube"></i></a>
-      </div>
-    </div>
-
-    <!-- Liên kết nhanh -->
-    <div>
-      <h3 class="text-lg font-semibold mb-3">Liên Kết Nhanh</h3>
-      <ul class="space-y-2 text-sm">
-        <li><a href="dashboard.php" class="hover:text-yellow-300">Trang Chủ</a></li>
-        <li><a href="journal.php" class="hover:text-yellow-300">Nhật Ký</a></li>
-        <li><a href="community.php" class="hover:text-yellow-300">Cộng Đồng</a></li>
-        <li><a href="thongke.php" class="hover:text-yellow-300">Thống Kê</a></li>
-      </ul>
-    </div>
-
-    <!-- Tài nguyên -->
-    <div>
-      <h3 class="text-lg font-semibold mb-3">Tài Nguyên</h3>
-      <ul class="space-y-2 text-sm">
-        <li><a href="index.php" class="hover:text-yellow-300">Hướng Dẫn Sử Dụng</a></li>
-        <li><a href="#" class="hover:text-yellow-300">Blog</a></li>
-        <li><a href="#" class="hover:text-yellow-300">Câu Hỏi Thường Gặp</a></li>
-        <li><a href="support.php" class="hover:text-yellow-300">Hỗ Trợ</a></li>
-      </ul>
-    </div>
-
-    <!-- Liên hệ -->
-    <div>
-      <h3 class="text-lg font-semibold mb-3">Liên Hệ</h3>
-
-      <p class="text-sm flex items-center gap-2">
-        <i class="fas fa-envelope"></i> support@habitu.com
-      </p>
-
-      <p class="text-sm mt-3">Giờ làm việc:</p>
-      <p class="text-sm">T2 - T6: 9:00 - 18:00</p>
-    </div>
-
-  </div>
-
-  <!-- Dòng cuối -->
-  <div class="text-center text-xs mt-10 opacity-80">
-    © 2025 Habitu. Tất cả quyền được bảo lưu. |
-    <a href="#" class="hover:text-yellow-300">Chính Sách Bảo Mật</a> • 
-    <a href="#" class="hover:text-yellow-300">Điều Khoản Sử Dụng</a>
-    <br>
-    <div class="mt-2 flex justify-center items-center gap-1">
-      Made with ❤️ by TMeo
-    </div>
-  </div>
-
-</footer>
-
-
-<!-- JAVASCRIPT -->
 <script>
+
+let posts = [];   // Danh sách bài viết
 let selectedPost = null;
 
-// POST DEMO (sau này thay bằng PHP)
-const demoPost = {
-  avatar: "assets/icons/avatar1.png",
-  name: "Minh Anh",
-  time: "2 giờ trước",
-  content: "Mình đã hoàn thành 30 ngày liên tục tập thể dục! Cảm giác thật tuyệt vời 💪✨",
-  likes: 24,
-  comments: [
-    { name: "Bảo Ngọc", text: "Tuyệt vời quá! Chúc mừng bạn 🎉" },
-    { name: "Huy Hoàng", text: "Cố gắng duy trì nữa nha!" }
-  ]
-};
+// RENDER DANH SÁCH BÀI VIẾT
+function renderPostList() {
+  const container = document.getElementById("postContainer");
+  container.innerHTML = "";
+
+  if (posts.length === 0) {
+    container.innerHTML = `
+      <p class="text-gray-600 text-center py-4">Chưa có bài viết nào.</p>
+    `;
+    return;
+  }
+
+  posts.forEach((post, index) => {
+    const item = document.createElement("div");
+    item.className =
+      "bg-white rounded-2xl shadow p-5 border cursor-pointer mb-4";
+    item.onclick = () => openPostDetail(post);
+
+    item.innerHTML = `
+      <div class="flex gap-3">
+        <img src="${post.avatar}" class="w-12 h-12 rounded-full border">
+        <div>
+          <h4 class="font-semibold">${post.name}</h4>
+          <p class="text-gray-500 text-sm">${post.time}</p>
+        </div>
+      </div>
+
+      <p class="mt-3 text-gray-800 leading-relaxed">
+        ${post.content}
+      </p>
+
+      <div class="flex gap-6 mt-4 text-gray-600">
+    <span class="flex items-center gap-1">
+        <i class="fa-regular fa-comment"></i> ${post.comments.length}
+    </span>
+</div>
+    `;
+
+    container.appendChild(item);
+  });
+}
 
 
-function openPostDetail(post = demoPost) {
+// ĐĂNG BÀI
+function submitPost() {
+  const content = document.getElementById("createPostInput").value.trim();
+  if (content === "") return;
+
+  const form = new FormData();
+  form.append("content", content);
+
+ fetch("community.php?action=create_post", {
+      method: "POST",
+      body: form
+  })
+  .then(res => res.json())
+  .then(data => {
+      if (data.status === "success") {
+          document.getElementById("createPostInput").value = "";
+          loadPosts(); // tải lại bài từ DB
+      } else {
+          alert("Lỗi: " + data.status);
+      }
+  });
+}
+
+// Load bài từ db
+
+function loadPosts() {
+  fetch("community.php?action=get_posts")
+    .then(res => res.json())
+    .then(data => {
+      posts = data.map(p => ({
+        post_id: p.post_id, 
+        avatar: "assets/icons/avatar1.png",
+        name: p.username,
+        time: p.created_at,
+        content: p.content,
+        likes: 0,
+        comments: p.comments.map(c => ({
+          name: c.username,
+          text: c.content_cmt
+        }))
+      }));
+
+      renderPostList();
+    });
+}
+
+
+// ======== POPUP XEM CHI TIẾT ========
+
+function openPostDetail(post) {
   selectedPost = post;
 
   document.getElementById("detailAvatar").src = post.avatar;
   document.getElementById("detailName").textContent = post.name;
   document.getElementById("detailTime").textContent = post.time;
   document.getElementById("detailContent").textContent = post.content;
-  document.getElementById("detailLikes").textContent = post.likes;
-  document.getElementById("detailCommentsCount").textContent = post.comments.length;
+  
+  document.getElementById("detailCommentsCount").textContent =
+    post.comments.length;
 
   renderComments();
 
-  const popup = document.getElementById("postDetailPopup");
-  popup.classList.remove("hidden");
-
-  const card = document.getElementById("postDetailCard");
-  card.classList.remove("popup-exit", "popup-exit-active");
-  card.classList.add("popup-enter-active");
+  document.getElementById("postDetailPopup").classList.remove("hidden");
 }
-
 
 function closePostDetail() {
-  const card = document.getElementById("postDetailCard");
-  const popup = document.getElementById("postDetailPopup");
-
-  card.classList.remove("popup-enter-active");
-  card.classList.add("popup-exit-active");
-
-  setTimeout(() => popup.classList.add("hidden"), 200);
+  document.getElementById("postDetailPopup").classList.add("hidden");
 }
 
 
-// RENDER COMMENT LIST
+
+// HIỂN THỊ BÌNH LUẬN
 function renderComments() {
   const list = document.getElementById("commentList");
   list.innerHTML = "";
 
-  selectedPost.comments.forEach(c => {
+  selectedPost.comments.forEach((c) => {
     const item = document.createElement("div");
     item.className = "bg-gray-100 p-3 rounded-lg";
     item.innerHTML = `<strong>${c.name}:</strong> ${c.text}`;
@@ -283,24 +312,46 @@ function renderComments() {
 }
 
 
-// ADD COMMENT
+// THÊM BÌNH LUẬN
 function addComment() {
-  const input = document.getElementById("commentInput");
-  const text = input.value.trim();
-  if (text === "") return;
+    const text = document.getElementById("commentInput").value.trim();
+    if (text === "" || !selectedPost) return;
 
-  selectedPost.comments.push({
-    name: "Bạn",
-    text: text
-  });
+    const form = new FormData();
+    form.append("post_id", selectedPost.post_id);
+    form.append("content", text);
 
-  input.value = "";
-  renderComments();
+    fetch("community.php?action=create_comment", {
+        method: "POST",
+        body: form
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            document.getElementById("commentInput").value = "";
+            loadPosts(); // reload dữ liệu từ DB
 
-  document.getElementById("detailCommentsCount").textContent = selectedPost.comments.length;
+            // cập nhật selectedPost theo dữ liệu mới
+            setTimeout(() => {
+                selectedPost = posts.find(p => p.post_id == selectedPost.post_id);
+                renderComments();
+                document.getElementById("detailCommentsCount").textContent =
+                    selectedPost.comments.length;
+            }, 200);
+
+        } else {
+            alert("Lỗi khi lưu bình luận!");
+        }
+    });
 }
-</script>
 
+
+// ====== KHỞI TẠO — RENDER LẦN ĐẦU ======
+window.onload = () => {
+  loadPosts();
+};
+
+</script>
 
 
 </body>
