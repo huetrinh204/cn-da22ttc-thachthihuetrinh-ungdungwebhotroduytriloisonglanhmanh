@@ -19,7 +19,7 @@ $username = $_SESSION["username"];
 
 </head>
 
-<body class="bg-gradient-to-br from-cyan-300 to-teal-400 min-h-screen">
+<body style="background: linear-gradient(to right, #00c8ffb2, #006ef5c0)";>
 
 <?php include "navbar.php"; ?>
 
