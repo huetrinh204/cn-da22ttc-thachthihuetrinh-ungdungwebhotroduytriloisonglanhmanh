@@ -1,13 +1,16 @@
 <?php
 // community.php
+
 session_start();
+
 include "config.php";
 
-// Bắt buộc phải đăng nhập
+// BẮT BUỘC ĐĂNG NHẬP
 if (!isset($_SESSION['user_id'])) {
     header("Location: dangnhap.php");
     exit();
 }
+
 
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
@@ -20,6 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'create_post') {
+
+    if ($_SESSION["is_blocked"] == 1) {
+        $errors[] = "TÀI KHOẢN CỦA BẠN ĐÃ BỊ KHOÁ, HIỆN TẠI KHÔNG THỂ ĐĂNG BÀI";
+    } else {
         $content = trim($_POST['post_content'] ?? '');
         if ($content === '') {
             $errors[] = "Nội dung bài viết không được để trống.";
@@ -51,8 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+  }
 
     if ($action === 'create_comment') {
+
+    if ($_SESSION["is_blocked"] == 1) {
+        $errors[] = "TÀI KHOẢN CỦA BẠN ĐÃ BỊ KHOÁ, HIỆN TẠI KHÔNG THỂ BÌNH LUẬN";
+    } else {
         $post_id = intval($_POST['post_id'] ?? 0);
         $cmt_content = trim($_POST['comment_content'] ?? '');
 
@@ -87,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+  }
 }
 
 // LẤY DỮ LIỆU

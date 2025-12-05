@@ -28,6 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["username"] = $user["username"];
             $_SESSION["email"] = $user["email"];
             $_SESSION["role"] = $user["role"];
+            $_SESSION["is_blocked"] = $user['is_blocked']; 
 
             // Cập nhật last_activity
             $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE user_id = ?")

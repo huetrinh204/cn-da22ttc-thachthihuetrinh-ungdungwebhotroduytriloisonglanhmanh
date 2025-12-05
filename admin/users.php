@@ -6,13 +6,39 @@ include "../config.php";
 $stmt = $pdo->query("SELECT * FROM users ORDER BY create_acc DESC");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+
+$blockedUsers = 0;
+foreach ($users as $u) {
+    if (!empty($u['is_blocked']) && $u['is_blocked'] == 1) {
+        $blockedUsers++;
+    }
+}
+
 // Đếm tổng
 $totalUsers = count($users);
 
 // Đếm hoạt động / không hoạt động theo last_activity
 $activeUsers = 0;
 $inactiveUsers = 0;
-$blockedUsers = 0; // nếu sau này có cột is_blocked thì sửa lại
+$blockedUsers = 0;
+
+foreach ($users as $u) {
+    $last = strtotime($u['last_activity']);
+    $now = time();
+
+    // hoạt động / không hoạt động
+    if ($now - $last <= 86400) {
+        $activeUsers++;
+    } else {
+        $inactiveUsers++;
+    }
+
+    // đã chặn?
+    if (!empty($u['is_blocked']) && $u['is_blocked'] == 1) {
+        $blockedUsers++;
+    }
+}
+ // nếu sau này có cột is_blocked thì sửa lại
 
 foreach ($users as $u) {
     $last = strtotime($u['last_activity']);
@@ -25,6 +51,47 @@ foreach ($users as $u) {
         $inactiveUsers++;
     }
 }
+
+/* ============================
+     API ACTIONS
+============================ */
+
+if (isset($_GET["action"])) {
+    header("Content-Type: application/json; charset=UTF-8");
+
+    $user_id = $_POST["user_id"] ?? null;
+
+    /* ---- CHẶN / BỎ CHẶN ---- */
+    if ($_GET["action"] == "toggleBlock") {
+        $stmt = $pdo->prepare("UPDATE users SET is_blocked = NOT is_blocked WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+
+        echo json_encode(["status" => "success"]);
+        exit;
+    }
+
+    /* ---- XOÁ NGƯỜI DÙNG ---- */
+    if ($_GET["action"] == "deleteUser") {
+        $stmt = $pdo->prepare("DELETE FROM users WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+
+        echo json_encode(["status" => "deleted"]);
+        exit;
+    }
+
+    /* ---- SỬA NGƯỜI DÙNG ---- */
+    if ($_GET["action"] == "updateUser") {
+        $username = $_POST["username"];
+        $email = $_POST["email"];
+
+        $stmt = $pdo->prepare("UPDATE users SET username=?, email=? WHERE user_id=?");
+        $stmt->execute([$username, $email, $user_id]);
+
+        echo json_encode(["status" => "updated"]);
+        exit;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -113,7 +180,8 @@ foreach ($users as $u) {
                     $postCount = $stmtP->fetchColumn();
                 ?>
 
-                <tr class="border-b hover:bg-gray-50">
+                <tr class="border-b 
+    <?= ($u['is_blocked'] == 1 ? 'bg-red-100 hover:bg-red-200' : 'hover:bg-gray-50') ?>">
                     <td class="flex items-center gap-2 py-2">
                         <div class="w-8 h-8 bg-blue-400 text-white rounded-full flex items-center justify-center font-bold">
                             <?= strtoupper(substr($u['username'], 0, 1)) ?>
@@ -131,9 +199,15 @@ foreach ($users as $u) {
                     <td><?= $postCount ?></td>
 
                     <td class="text-center text-lg">
-                        <i class="ri-edit-2-line text-blue-500 cursor-pointer mx-1"></i>
-                        <i class="ri-forbid-line text-yellow-500 cursor-pointer mx-1"></i>
-                        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"></i>
+                        <i class="ri-edit-2-line text-blue-500 cursor-pointer mx-1"
+   onclick="openEdit(<?= $u['user_id'] ?>, '<?= $u['username'] ?>', '<?= $u['email'] ?>')"></i>
+
+<i class="ri-forbid-line text-yellow-500 cursor-pointer mx-1"
+   onclick="toggleBlock(<?= $u['user_id'] ?>)"></i>
+
+<i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"
+   onclick="deleteUser(<?= $u['user_id'] ?>)"></i>
+
                     </td>
                 </tr>
 
@@ -146,5 +220,87 @@ foreach ($users as $u) {
 
 </div>
 
+<!-- POPUP EDIT -->
+<div id="editPopup"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-white p-6 rounded shadow w-96">
+        <h2 class="text-xl font-bold mb-3">Sửa thông tin</h2>
+
+        <input id="editName" type="text" class="w-full border p-2 rounded mb-3" placeholder="Tên">
+        <input id="editEmail" type="text" class="w-full border p-2 rounded mb-3" placeholder="Email">
+
+        <div class="flex justify-end gap-2">
+            <button onclick="closeEdit()" class="px-4 py-2 bg-gray-300 rounded">Hủy</button>
+            <button onclick="saveEdit()" class="px-4 py-2 bg-blue-500 text-white rounded">Lưu</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
+
+
+<script>
+let currentUserId = null;
+
+/* --------------------------
+    MỞ POPUP SỬA
+--------------------------- */
+function openEdit(id, name, email) {
+    currentUserId = id;
+    document.getElementById("editName").value = name;
+    document.getElementById("editEmail").value = email;
+    document.getElementById("editPopup").classList.remove("hidden");
+}
+
+function closeEdit() {
+    document.getElementById("editPopup").classList.add("hidden");
+}
+
+/* --------------------------
+    LƯU THAY ĐỔI
+--------------------------- */
+function saveEdit() {
+    let name = document.getElementById("editName").value;
+    let email = document.getElementById("editEmail").value;
+
+    fetch("users.php?action=updateUser", {
+        method: "POST",
+        body: new URLSearchParams({
+            user_id: currentUserId,
+            username: name,
+            email: email
+        })
+    })
+    .then(res => res.json())
+    .then(() => location.reload());
+}
+
+/* --------------------------
+    CHẶN / BỎ CHẶN
+--------------------------- */
+function toggleBlock(id) {
+    if (!confirm("Bạn có chắc muốn thay đổi trạng thái chặn?")) return;
+
+    fetch("users.php?action=toggleBlock", {
+        method: "POST",
+        body: new URLSearchParams({ user_id: id })
+    })
+    .then(res => res.json())
+    .then(() => location.reload());
+}
+
+/* --------------------------
+    XOÁ NGƯỜI DÙNG
+--------------------------- */
+function deleteUser(id) {
+    if (!confirm("Xoá người dùng này vĩnh viễn?")) return;
+
+    fetch("users.php?action=deleteUser", {
+        method: "POST",
+        body: new URLSearchParams({ user_id: id })
+    })
+    .then(res => res.json())
+    .then(() => location.reload());
+}
+</script>
