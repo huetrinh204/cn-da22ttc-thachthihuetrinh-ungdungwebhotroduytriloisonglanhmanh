@@ -1,3 +1,28 @@
+<?php
+session_start();
+include "../config.php";
+
+// Kiểm tra đăng nhập
+if (!isset($_SESSION["user_id"])) {
+    header("Location: dangnhap.php");
+    exit();
+}
+
+$user_id = $_SESSION["user_id"];
+$username = $_SESSION["username"];
+
+// Lấy quyền user
+$stmt = $pdo->prepare("SELECT role FROM users WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$role = $stmt->fetchColumn();
+
+// Nếu không phải admin → không cho truy cập
+if ($role !== "admin") {
+    header("Location: ../index.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>

@@ -1,3 +1,60 @@
+<?php
+session_start();
+include "../config.php";
+
+// Kiểm tra đăng nhập
+if (!isset($_SESSION["user_id"])) {
+    header("Location: dangnhap.php");
+    exit();
+}
+
+$user_id = $_SESSION["user_id"];
+$username = $_SESSION["username"];
+
+// Lấy quyền user
+$stmt = $pdo->prepare("SELECT role FROM users WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$role = $stmt->fetchColumn();
+
+// Nếu không phải admin → không cho truy cập
+if ($role !== "admin") {
+    header("Location: ../index.php");
+    exit();
+}
+
+
+
+// =========================
+// XÓA BÀI VIẾT 
+// =========================
+if (isset($_GET["action"]) && $_GET["action"] == "deletePost") {
+    header("Content-Type: application/json; charset=UTF-8");
+
+    $post_id = $_POST["post_id"] ?? null;
+
+    if ($post_id) {
+        $stmt = $pdo->prepare("DELETE FROM post WHERE post_id=?");
+        $stmt->execute([$post_id]);
+
+        echo json_encode(["status" => "deleted"]);
+    } else {
+        echo json_encode(["status" => "error"]);
+    }
+    exit;
+}
+
+// =========================
+// LẤY DANH SÁCH BÀI VIẾT
+// =========================
+$stmt = $pdo->query("
+    SELECT p.*, u.username 
+    FROM post p
+    JOIN users u ON u.user_id = p.user_id
+    ORDER BY p.created_at DESC
+");
+$posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -13,7 +70,9 @@
 <?php include "navbar.php"; ?>
 
 <div class="px-10 py-5">
-    <h1 class="text-3xl font-bold" style="color:#ffffff; text-shadow: 2px 2px 6px rgba(0,0,0,0.5);">Quản Lý Bài Viết</h1>
+    <h1 class="text-3xl font-bold" style="color:#ffffff; text-shadow: 2px 2px 6px rgba(0,0,0,0.5);">
+        Quản Lý Bài Viết
+    </h1>
     <p class="text-gray-700 mb-6">Theo dõi và quản lý tất cả bài viết của người dùng</p>
 
     <!-- Search + Filter -->
@@ -38,106 +97,64 @@
                     <th class="text-center">Hành động</th>
                 </tr>
             </thead>
+
             <tbody>
-               <!-- Row 1 -->
-<tr class="border-b hover:bg-gray-50">
-    <td class="flex items-center gap-2 py-2">
-        <div class="w-8 h-8 bg-pink-400 text-white rounded-full flex items-center justify-center font-bold">
-            M
-        </div>
-        Minh Anh
-    </td>
-    <td>Mình đã hoàn thành 30 ngày liên tục tập thể dục! Cảm giác thật tuyệt vời 💪</td>
-    <td>12</td>
-    <td>10:30 14/11/2024</td>
-    <td><span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-sm">Đã đăng</span></td>
-    <td class="text-center text-lg">
-        <i class="ri-edit-2-line text-blue-500 cursor-pointer mx-1"></i>
-        <i class="ri-forbid-line text-yellow-500 cursor-pointer mx-1"></i>
-        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"></i>
-    </td>
-</tr>
+            <?php foreach ($posts as $p): ?>
 
-<!-- Row 2 -->
-<tr class="border-b hover:bg-gray-50">
-    <td class="flex items-center gap-2 py-2">
-        <div class="w-8 h-8 bg-green-400 text-white rounded-full flex items-center justify-center font-bold">
-            T
-        </div>
-        Tuấn Kiệt
-    </td>
-    <td>Ai có tips gì để duy trì thói quen đọc sách không? Mình hay bỏ lỡ 😅</td>
-    <td>8</td>
-    <td>09:15 14/11/2024</td>
-    <td><span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-sm">Đã đăng</span></td>
-    <td class="text-center text-lg">
-        <i class="ri-edit-2-line text-blue-500 cursor-pointer mx-1"></i>
-        <i class="ri-forbid-line text-yellow-500 cursor-pointer mx-1"></i>
-        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"></i>
-    </td>
-</tr>
+                <?php
+                // Avatar ký tự đầu
+                $avatar = strtoupper(substr($p['username'], 0, 1));
 
-<!-- Row 3 -->
-<tr class="border-b hover:bg-gray-50">
-    <td class="flex items-center gap-2 py-2">
-        <div class="w-8 h-8 bg-pink-300 text-white rounded-full flex items-center justify-center font-bold">
-            T
-        </div>
-        Thu Hà
-    </td>
-    <td>Chào mọi người! Hôm nay mình muốn chia sẻ về hành trình giảm cân của mình...</td>
-    <td>24</td>
-    <td>16:45 13/11/2024</td>
-    <td><span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-sm">Đã đăng</span></td>
-    <td class="text-center text-lg">
-        <i class="ri-edit-2-line text-blue-500 cursor-pointer mx-1"></i>
-        <i class="ri-forbid-line text-yellow-500 cursor-pointer mx-1"></i>
-        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"></i>
-    </td>
-</tr>
+                // Đếm số bình luận
+                $stmtC = $pdo->prepare("SELECT COUNT(*) FROM comment WHERE post_id=?");
+                $stmtC->execute([$p["post_id"]]);
+                $commentCount = $stmtC->fetchColumn();
 
-<!-- Row 4: Bị báo cáo -->
-<tr class="border-b hover:bg-gray-50">
-    <td class="flex items-center gap-2 py-2">
-        <div class="w-8 h-8 bg-yellow-400 text-white rounded-full flex items-center justify-center font-bold">
-            Đ
-        </div>
-        Đức Anh
-    </td>
-    <td>Nội dung không phù hợp vi phạm điều khoản cộng đồng</td>
-    <td>2</td>
-    <td>14:20 13/11/2024</td>
-    <td><span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-sm">Bị báo cáo</span></td>
-    <td class="text-center text-lg">
-        <i class="ri-edit-2-line text-blue-500 cursor-pointer mx-1"></i>
-        <i class="ri-forbid-line text-yellow-500 cursor-pointer mx-1"></i>
-        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"></i>
-    </td>
-</tr>
+                // Trạng thái (tạm thời mặc định)
+                $status = "<span class='bg-green-100 text-green-600 px-2 py-1 rounded-full text-sm'>Đã đăng</span>";
+                ?>
 
-<!-- Row 5 -->
-<tr class="border-b hover:bg-gray-50">
-    <td class="flex items-center gap-2 py-2">
-        <div class="w-8 h-8 bg-purple-400 text-white rounded-full flex items-center justify-center font-bold">
-            L
-        </div>
-        Lan Anh
-    </td>
-    <td>Streak 60 ngày rồi! Ai muốn kết bạn để cùng động viên nhau không? 🤝</td>
-    <td>31</td>
-    <td>11:00 13/11/2024</td>
-    <td><span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-sm">Đã đăng</span></td>
-    <td class="text-center text-lg">
-        <i class="ri-edit-2-line text-blue-500 cursor-pointer mx-1"></i>
-        <i class="ri-forbid-line text-yellow-500 cursor-pointer mx-1"></i>
-        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"></i>
-    </td>
-</tr>
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="flex items-center gap-2 py-2">
+                        <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                            <?= $avatar ?>
+                        </div>
+                        <?= htmlspecialchars($p['username']) ?>
+                    </td>
 
+                    <td><?= htmlspecialchars($p['content']) ?></td>
+
+                    <td><?= $commentCount ?></td>
+
+                    <td><?= date("H:i d/m/Y", strtotime($p["created_at"])) ?></td>
+
+                    <td><?= $status ?></td>
+
+                    <td class="text-center text-lg">
+                        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"
+                           onclick="deletePost(<?= $p['post_id'] ?>)"></i>
+                    </td>
+                </tr>
+
+            <?php endforeach; ?>
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- JS DELETE -->
+<script>
+function deletePost(id) {
+    if (!confirm("Bạn có chắc muốn xóa bài viết này?")) return;
+
+    fetch("post.php?action=deletePost", {
+        method: "POST",
+        body: new URLSearchParams({ post_id: id })
+    })
+    .then(res => res.json())
+    .then(() => location.reload());
+}
+</script>
 
 </body>
 </html>

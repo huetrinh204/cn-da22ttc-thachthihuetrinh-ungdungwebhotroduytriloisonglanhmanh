@@ -37,7 +37,7 @@
  <div class="relative flex items-center gap-2">
     <span id="adminDropdownBtn" class="flex items-center gap-1 cursor-pointer select-none text-white">
         <i class="fas fa-user-circle text-xl"></i>
-        Admin
+         <span><?php echo htmlspecialchars($username); ?></span>
         <i class="fas fa-chevron-down text-sm"></i>
     </span>
 
