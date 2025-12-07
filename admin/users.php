@@ -38,19 +38,6 @@ foreach ($users as $u) {
         $blockedUsers++;
     }
 }
- // nếu sau này có cột is_blocked thì sửa lại
-
-foreach ($users as $u) {
-    $last = strtotime($u['last_activity']);
-    $now = time();
-
-    // 24 tiếng = 86400 giây
-    if ($now - $last <= 86400) {
-        $activeUsers++;
-    } else {
-        $inactiveUsers++;
-    }
-}
 
 /* ============================
      API ACTIONS
