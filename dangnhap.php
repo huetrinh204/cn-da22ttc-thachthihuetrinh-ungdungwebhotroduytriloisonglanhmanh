@@ -155,8 +155,20 @@ input[type="password"] {
 
       <div class="divider">Hoặc</div>
 
-      <button type="button" class="social-btn google">Đăng nhập với Google</button>
-      <button type="button" class="social-btn facebook">Đăng nhập với Facebook</button>
+  <button onclick="window.location.href='google-login.php'" 
+        type="button" 
+        class="social-btn google" 
+        style="display:flex; align-items:center; justify-content:center; gap:8px; border:1px solid #ccc; background:#fff; color:#db4437;">
+    <!-- Google icon chính thức 4 màu -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 533.5 544.3">
+        <path fill="#4285F4" d="M533.5 278.4c0-17.5-1.6-34.3-4.6-50.7H272v95.8h146.9c-6.4 34.8-25.4 64.4-54.3 84.1v69.7h87.8c51.5-47.5 81.1-117.3 81.1-199z"/>
+        <path fill="#34A853" d="M272 544.3c73.6 0 135.3-24.4 180.5-66.2l-87.8-69.7c-24.3 16.3-55.4 25.8-92.7 25.8-71.4 0-131.9-48.2-153.7-112.8H27.8v70.9C73.1 487.5 167.2 544.3 272 544.3z"/>
+        <path fill="#FBBC05" d="M118.3 323.2c-5.2-15.5-8.2-32-8.2-49.2s3-33.7 8.2-49.2V154.1H27.8C10.1 190.6 0 233.3 0 278s10.1 87.4 27.8 123.9l90.5-78.7z"/>
+        <path fill="#EA4335" d="M272 109.7c39.9 0 75.5 13.7 103.6 40.6l77.8-77.8C405.4 24.5 343.6 0 272 0 167.2 0 73.1 56.8 27.8 141.2l90.5 70.9c21.8-64.6 82.3-112.4 153.7-112.4z"/>
+    </svg>
+    <span>Đăng nhập với Google</span>
+</button>
+     
     </form>
 
     <p class="signup-link">Chưa có tài khoản? <a href="dangky.php">Đăng ký ngay</a></p>
