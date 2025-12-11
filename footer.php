@@ -61,7 +61,7 @@
   <!-- Dòng cuối -->
   <div class="text-center text-xs mt-10 opacity-80">
     © 2025 Habitu. Tất cả quyền được bảo lưu. |
-    <a href="#" class="hover:text-yellow-300">Chính Sách Bảo Mật</a> • 
+    <a href="#" class="hover:text-yellow-300">Chính Sách Bảo Mật</a> •
     <a href="#" class="hover:text-yellow-300">Điều Khoản Sử Dụng</a>
     <br>
     <div class="mt-2 flex justify-center items-center gap-1">

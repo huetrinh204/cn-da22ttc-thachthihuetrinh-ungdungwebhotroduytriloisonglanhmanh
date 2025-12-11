@@ -91,7 +91,7 @@ if (!$defaultUser) $defaultUser = $users[0]["user_id"]; // fallback nếu chưa 
 
 <div class="px-6 md:px-10 py-5">
     <h1 class="text-3xl font-bold text-white drop-shadow-lg">Dashboard</h1>
-    <p class="text-gray-200 mb-6">Quản lý tổng quan hoạt động người dùng</p>
+    <p class="text-gray-700 mb-6 text-sm sm:text-base">Quản lý tổng quan hoạt động người dùng</p>
 </div>
 
 <!-- ===================== METRICS ===================== -->
