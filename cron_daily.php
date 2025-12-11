@@ -28,12 +28,12 @@ if (!$rows) {
 // Gửi mail cho từng người
 foreach ($rows as $r) {
 
-    $email   = $r["email"];
-    $name    = $r["username"];
-    $habit   = $r["habit_name"];
+    $email = $r["email"];
+    $name = $r["username"];
+    $habit = $r["habit_name"];
 
     $subject = "HABITU REMINDER !";
-    
+
     $message = "
         <h3>Chào bạn, <b>$name</b>!</h3>
         <p>Bạn chưa hoàn thành thói quen: <b>$habit</b> hôm nay.</p>

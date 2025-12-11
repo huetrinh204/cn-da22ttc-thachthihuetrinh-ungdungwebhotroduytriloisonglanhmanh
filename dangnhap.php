@@ -9,51 +9,52 @@ $popup = "";
 $success = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST["email"];
-    $password = $_POST["password"];
+  $email = $_POST["email"];
+  $password = $_POST["password"];
 
-    try {
-        // Lấy user theo email
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
-        $stmt->execute([":email" => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+  try {
+    // Lấy user theo email
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
+    $stmt->execute([":email" => $email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
-            $popup = "Email chưa được đăng ký!";
-        } elseif (!password_verify($password, $user["password"])) {
-            $popup = "Sai mật khẩu!";
-        } else {
-            // Lưu session
-            $_SESSION["user_id"] = $user["user_id"];
-            $_SESSION["username"] = $user["username"];
-            $_SESSION["email"] = $user["email"];
-            $_SESSION["role"] = $user["role"];
-            $_SESSION["is_blocked"] = $user['is_blocked']; 
+    if (!$user) {
+      $popup = "Email chưa được đăng ký!";
+    } elseif (!password_verify($password, $user["password"])) {
+      $popup = "Sai mật khẩu!";
+    } else {
+      // Lưu session
+      $_SESSION["user_id"] = $user["user_id"];
+      $_SESSION["username"] = $user["username"];
+      $_SESSION["email"] = $user["email"];
+      $_SESSION["role"] = $user["role"];
+      $_SESSION["is_blocked"] = $user['is_blocked'];
 
-            // Cập nhật last_activity
-            $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE user_id = ?")
-                ->execute([$user["user_id"]]);
+      // Cập nhật last_activity
+      $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE user_id = ?")
+        ->execute([$user["user_id"]]);
 
-            $popup = "Đăng nhập thành công!";
-            $success = true;
+      $popup = "Đăng nhập thành công!";
+      $success = true;
 
-             // PHÂN QUYỀN TẠI ĐÂY
-    if ($user["role"] === "admin") {
+      // PHÂN QUYỀN TẠI ĐÂY
+      if ($user["role"] === "admin") {
         header("Location: admin/index.php");
         exit();
-    } else {
+      } else {
         header("Location: index.php");
         exit();
+      }
     }
-        }
-    } catch (PDOException $e) {
-        $popup = "Lỗi: " . $e->getMessage();
-    }
+  } catch (PDOException $e) {
+    $popup = "Lỗi: " . $e->getMessage();
+  }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,81 +62,175 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-body {
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(to right, #00c6ff, #0072ff);
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-}
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
 
-.container {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  width: 360px;
-  max-width: 90%;
-  padding: 40px 30px;
-  margin: 40px auto;
-  text-align: center;
-}
+    .container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 360px;
+      max-width: 90%;
+      padding: 40px 30px;
+      margin: 40px auto;
+      text-align: center;
+    }
 
-.container .logo,
-.container h2,
-.container > p:first-of-type {
-  text-align: center;
-}
+    .container .logo,
+    .container h2,
+    .container>p:first-of-type {
+      text-align: center;
+    }
 
-.container .logo img {
-  display: block;
-  margin: 0 auto 10px;
-}
+    .container .logo img {
+      display: block;
+      margin: 0 auto 10px;
+    }
 
-h2 { margin: 10px 0 5px; color: #00bfff; }
-p { font-size: 14px; color: #666; margin-bottom: 20px; }
-form { text-align: left; }
-label { display: block; font-size: 13px; margin-bottom: 5px; color: #333; }
-input[type="email"],
-input[type="password"] {
-  width: 100%; padding: 10px; margin-bottom: 15px;
-  border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px;
-}
-.options {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
-}
-.options a { font-size: 13px; color: #00bfff; text-decoration: none; }
-.btn {
-  width: 100%; padding: 10px; background-color: #00bfff; color: white; border: none; border-radius: 6px;
-  cursor: pointer; font-size: 15px; margin-bottom: 15px;
-}
-.btn:hover { background-color: #0099cc; }
-.divider { text-align: center; margin: 10px 0; color: #aaa; font-size: 13px; }
-.social-btn {
-  width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;
-  margin-bottom: 10px; cursor: pointer; background-color: #fff; font-size: 14px;
-}
-.social-btn.google { color: #db4437; }
-.social-btn.facebook { color: #4267B2; }
-.signup-link { font-size: 13px; color: #666; text-align: center; }
-.signup-link a { color: #00bfff; text-decoration: none; font-weight: 600; }
+    h2 {
+      margin: 10px 0 5px;
+      color: #00bfff;
+    }
 
-/* popup */
-#popup {
-  display: none; position: fixed; top:0; left:0; width:100%; height:100%;
-  background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index:9999;
-}
-#popup .box {
-  background: white; padding: 20px 30px; border-radius: 8px;
-  text-align: center; max-width: 300px; position: relative;
-}
-#popup .box button.close {
-  position: absolute; top:5px; right:8px; border:none; background:none; font-size:18px; cursor:pointer;
-}
+    p {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    form {
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .options a {
+      font-size: 13px;
+      color: #00bfff;
+      text-decoration: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background-color: #00bfff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      margin-bottom: 15px;
+    }
+
+    .btn:hover {
+      background-color: #0099cc;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 10px 0;
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    .social-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      cursor: pointer;
+      background-color: #fff;
+      font-size: 14px;
+    }
+
+    .social-btn.google {
+      color: #db4437;
+    }
+
+    .social-btn.facebook {
+      color: #4267B2;
+    }
+
+    .signup-link {
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+    }
+
+    .signup-link a {
+      color: #00bfff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* popup */
+    #popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #popup .box {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 300px;
+      position: relative;
+    }
+
+    #popup .box button.close {
+      position: absolute;
+      top: 5px;
+      right: 8px;
+      border: none;
+      background: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <div class="logo"><img src="assets/logo_habitu.png" width="120" height="120" alt="Habitu Logo" class="logo-img"></div>
+    <div class="logo"><img src="assets/logo_habitu.png" width="120" height="120" alt="Habitu Logo" class="logo-img">
+    </div>
     <h2>Đăng Nhập</h2>
     <p>Chào mừng trở lại! Hãy tiếp tục hành trình của bạn 🐾</p>
 
@@ -155,90 +250,119 @@ input[type="password"] {
 
       <div class="divider">Hoặc</div>
 
-  <button onclick="window.location.href='google-login.php'" 
-        type="button" 
-        class="social-btn google" 
+      <button onclick="window.location.href='google-login.php'" type="button" class="social-btn google"
         style="display:flex; align-items:center; justify-content:center; gap:8px; border:1px solid #ccc; background:#fff; color:#db4437;">
-    <!-- Google icon chính thức 4 màu -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 533.5 544.3">
-        <path fill="#4285F4" d="M533.5 278.4c0-17.5-1.6-34.3-4.6-50.7H272v95.8h146.9c-6.4 34.8-25.4 64.4-54.3 84.1v69.7h87.8c51.5-47.5 81.1-117.3 81.1-199z"/>
-        <path fill="#34A853" d="M272 544.3c73.6 0 135.3-24.4 180.5-66.2l-87.8-69.7c-24.3 16.3-55.4 25.8-92.7 25.8-71.4 0-131.9-48.2-153.7-112.8H27.8v70.9C73.1 487.5 167.2 544.3 272 544.3z"/>
-        <path fill="#FBBC05" d="M118.3 323.2c-5.2-15.5-8.2-32-8.2-49.2s3-33.7 8.2-49.2V154.1H27.8C10.1 190.6 0 233.3 0 278s10.1 87.4 27.8 123.9l90.5-78.7z"/>
-        <path fill="#EA4335" d="M272 109.7c39.9 0 75.5 13.7 103.6 40.6l77.8-77.8C405.4 24.5 343.6 0 272 0 167.2 0 73.1 56.8 27.8 141.2l90.5 70.9c21.8-64.6 82.3-112.4 153.7-112.4z"/>
-    </svg>
-    <span>Đăng nhập với Google</span>
-</button>
-     
+        <!-- Google icon chính thức 4 màu -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 533.5 544.3">
+          <path fill="#4285F4"
+            d="M533.5 278.4c0-17.5-1.6-34.3-4.6-50.7H272v95.8h146.9c-6.4 34.8-25.4 64.4-54.3 84.1v69.7h87.8c51.5-47.5 81.1-117.3 81.1-199z" />
+          <path fill="#34A853"
+            d="M272 544.3c73.6 0 135.3-24.4 180.5-66.2l-87.8-69.7c-24.3 16.3-55.4 25.8-92.7 25.8-71.4 0-131.9-48.2-153.7-112.8H27.8v70.9C73.1 487.5 167.2 544.3 272 544.3z" />
+          <path fill="#FBBC05"
+            d="M118.3 323.2c-5.2-15.5-8.2-32-8.2-49.2s3-33.7 8.2-49.2V154.1H27.8C10.1 190.6 0 233.3 0 278s10.1 87.4 27.8 123.9l90.5-78.7z" />
+          <path fill="#EA4335"
+            d="M272 109.7c39.9 0 75.5 13.7 103.6 40.6l77.8-77.8C405.4 24.5 343.6 0 272 0 167.2 0 73.1 56.8 27.8 141.2l90.5 70.9c21.8-64.6 82.3-112.4 153.7-112.4z" />
+        </svg>
+        <span>Đăng nhập với Google</span>
+      </button>
+
     </form>
 
     <p class="signup-link">Chưa có tài khoản? <a href="dangky.php">Đăng ký ngay</a></p>
   </div>
 
- 
+
   <!-- popup -->
-<div id="popup">
-  <div class="box">
-    <button class="close" onclick="document.getElementById('popup').style.display='none'">&times;</button>
-    <p id="popupText"></p>
+  <div id="popup">
+    <div class="box">
+      <button class="close" onclick="document.getElementById('popup').style.display='none'">&times;</button>
+      <p id="popupText"></p>
+    </div>
   </div>
-</div>
 
-<style>
-  /* popup nền mờ toàn trang */
-  #popup {
-    display: none;
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.4); 
-    justify-content: center; align-items: center; z-index:9999;
-    animation: fadeIn 0.3s;
-  }
+  <style>
+    /* popup nền mờ toàn trang */
+    #popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s;
+    }
 
-  #popup .box {
-    background: #ffffff;
-    padding: 25px 35px;
-    border-radius: 12px;
-    text-align: center;
-    max-width: 350px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    font-family: 'Inter', sans-serif;
-    color: #0072ff; /* chữ xanh giống nền */
-    font-size: 16px;
-    position: relative;
-    animation: slideDown 0.3s;
-  }
+    #popup .box {
+      background: #ffffff;
+      padding: 25px 35px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 350px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      font-family: 'Inter', sans-serif;
+      color: #0072ff;
+      /* chữ xanh giống nền */
+      font-size: 16px;
+      position: relative;
+      animation: slideDown 0.3s;
+    }
 
-  #popup .box button.close {
-    position: absolute; top:10px; right:12px;
-    border:none; background:none; font-size:20px; cursor:pointer;
-    color: #0072ff;
-    transition: transform 0.2s, color 0.2s;
-  }
-  #popup .box button.close:hover {
-    color: #004c99;
-    transform: scale(1.2);
-  }
+    #popup .box button.close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      border: none;
+      background: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #0072ff;
+      transition: transform 0.2s, color 0.2s;
+    }
 
-  @keyframes fadeIn {
-    from {opacity: 0;} to {opacity:1;}
-  }
+    #popup .box button.close:hover {
+      color: #004c99;
+      transform: scale(1.2);
+    }
 
-  @keyframes slideDown {
-    from {transform: translateY(-20px); opacity:0;} 
-    to {transform: translateY(0); opacity:1;}
-  }
-</style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
 
 
-<script>
-  <?php if(!empty($popup)): ?>
-    const popup = document.getElementById('popup');
-    const popupText = document.getElementById('popupText');
-    popupText.innerText = "<?= $popup ?>";
-    popup.style.display = "flex";
-    <?php if($success): ?>
-      setTimeout(function(){ window.location.href='index.php'; }, 1000);
+  <script>
+    <?php if (!empty($popup)): ?>
+      const popup = document.getElementById('popup');
+      const popupText = document.getElementById('popupText');
+      popupText.innerText = "<?= $popup ?>";
+      popup.style.display = "flex";
+      <?php if ($success): ?>
+        setTimeout(function () { window.location.href = 'index.php'; }, 1000);
+      <?php endif; ?>
     <?php endif; ?>
-  <?php endif; ?>
-</script>
+  </script>
 </body>
+
 </html>
