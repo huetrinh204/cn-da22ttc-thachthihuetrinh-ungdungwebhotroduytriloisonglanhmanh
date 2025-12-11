@@ -109,7 +109,7 @@ $totalUsers = $stmtUsers->fetch(PDO::FETCH_ASSOC)['total_users'];
     <p class="text-gray-700 mb-6">Quản lý thói quen của người dùng và tạo thói quen mẫu</p>
 
     <!-- Stats -->
-    <div class="grid grid-cols-4 gap-6 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <div class="bg-white shadow rounded-lg p-5 text-center">
             <p class="text-gray-500">Tổng thói quen</p>
             <h2 class="text-3xl font-bold text-blue-600"><?php echo $totalHabits; ?></h2>
@@ -130,9 +130,9 @@ $totalUsers = $stmtUsers->fetch(PDO::FETCH_ASSOC)['total_users'];
 
 
 <!-- Search + Tạo Thói Quen Mẫu -->
-<div class="flex flex-wrap gap-4 mb-6 items-center justify-between">
+<div class="flex flex-wrap gap-4 mb-6 items-center justify-between w-full">
     <!-- Form tìm kiếm -->
-   <form method="GET" class="flex gap-2 mb-6 items-center w-full">
+   <form method="GET" class="flex flex-col md:flex-row gap-3 w-full">
     <input type="text" name="search" 
        placeholder="🔍 Tìm kiếm thói quen..." 
        class="border border-gray-300 px-4 py-2 rounded-l-lg flex-1 focus:outline-none"
@@ -146,7 +146,7 @@ $totalUsers = $stmtUsers->fetch(PDO::FETCH_ASSOC)['total_users'];
         Tất cả
     </a>
 
-   <button id="createHabitBtn" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded ml-auto font-bold">
+   <button id="createHabitBtn" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded md:ml-auto w-full md:w-auto font-bold">
     + Tạo Thói Quen Mẫu
 </button>
 </form>
@@ -159,7 +159,7 @@ $totalUsers = $stmtUsers->fetch(PDO::FETCH_ASSOC)['total_users'];
 
 <!-- Popup Form -->
 <div id="createHabitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl w-11/12 md:w-1/2 p-6 relative">
+    <div class="bg-white rounded-2xl shadow-2xl w-11/12 md:w-1/2 p-4 sm:p-6 relative max-h-[90vh] overflow-y-auto">
         <!-- Header -->
         <div class="mb-4 p-4 rounded-t-2xl bg-gradient-to-r from-blue-400 to-cyan-500 text-white font-bold text-xl flex justify-between items-center">
             Tạo Thói Quen Mẫu
@@ -186,7 +186,7 @@ $totalUsers = $stmtUsers->fetch(PDO::FETCH_ASSOC)['total_users'];
                        class="w-full border border-gray-300 px-3 py-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400" required>
 
                 <!-- Lưới icon ẩn -->
-                <div id="iconGrid" class="absolute top-full left-0 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-2 grid grid-cols-5 gap-2 hidden max-h-48 overflow-y-auto z-50">
+                <div id="iconGrid" class="absolute top-full left-0 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-2 grid grid-cols-4 sm:grid-cols-5 gap-2 hidden max-h-48 overflow-y-auto z-50">
                     <!-- 25 icon -->
                     <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">💧</div>
                     <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🏃</div>
@@ -301,7 +301,7 @@ document.addEventListener('click', function(e){
                 <input id="edit_iconInput" type="text" readonly placeholder="Chọn icon..." 
                        class="w-full border border-gray-300 px-3 py-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400" required>
 
-                <div id="edit_iconGrid" class="absolute top-full left-0 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-2 grid grid-cols-5 gap-2 hidden max-h-48 overflow-y-auto z-50">
+                <div id="edit_iconGrid" class="absolute top-full left-0 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-2 grid grid-cols-4 sm:grid-cols-5 gap-2 hidden max-h-48 overflow-y-auto z-50">
                     <!-- Copy 25 icon từ form tạo thói quen -->
                     <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">💧</div>
                     <div class="cursor-pointer text-2xl flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r from-blue-200 to-cyan-200 transition">🏃</div>

@@ -110,16 +110,22 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <?php include "navbar.php"; ?>
 
-<div class="px-10 py-5">
-    <h1 class="text-3xl font-bold text-white drop-shadow-lg">Quản Lý Bài Viết</h1>
-    <p class="text-gray-700 mb-6">Theo dõi và quản lý tất cả bài viết</p>
+<div class="px-4 md:px-10 py-5">
+    <h1 class="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
+        Quản Lý Bài Viết
+    </h1>
+    <p class="text-gray-700 mb-6 text-sm md:text-base">
+        Theo dõi và quản lý tất cả bài viết
+    </p>
 
-    <div class="bg-white shadow rounded-lg p-5 overflow-x-auto">
-        <table class="w-full text-left">
+    <!-- BẢNG RESPONSIVE -->
+    <div class="bg-white shadow rounded-lg p-3 md:p-5 overflow-x-auto">
+
+        <table class="min-w-[700px] w-full text-left">
             <thead>
-                <tr class="border-b text-gray-700 font-bold">
+                <tr class="border-b text-gray-700 font-bold text-sm md:text-base">
                     <th class="py-2">Người đăng</th>
-                    <th>Nội dung</th>
+                    <th class="w-[250px]">Nội dung</th>
                     <th>Bình luận</th>
                     <th>Thời gian</th>
                     <th>Trạng thái</th>
@@ -135,49 +141,58 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $cmt->execute([$p["post_id"]]);
                 $commentCount = $cmt->fetchColumn();
                 ?>
-                <tr class="border-b hover:bg-gray-50">
+                <tr class="border-b hover:bg-gray-50 text-sm md:text-base">
                     <td class="flex items-center gap-2 py-2">
                         <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex justify-center items-center font-bold">
                             <?= $avatar ?>
                         </div>
-                        <?= htmlspecialchars($p["username"]) ?>
+                        <span class="truncate max-w-[100px] md:max-w-none">
+                            <?= htmlspecialchars($p["username"]) ?>
+                        </span>
                     </td>
 
-                    <td><?= htmlspecialchars($p["content"]) ?></td>
+                    <td class="break-words">
+                        <?= htmlspecialchars($p["content"]) ?>
+                    </td>
 
                     <td><?= $commentCount ?></td>
 
-                    <td><?= date("H:i d/m/Y", strtotime($p["created_at"])) ?></td>
-
-                    <td>
-                        <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-sm">Đã đăng</span>
+                    <td class="whitespace-nowrap">
+                        <?= date("H:i d/m/Y", strtotime($p["created_at"])) ?>
                     </td>
 
-                    <td class="text-center text-xl">
-                        <i class="ri-chat-history-line text-blue-500 cursor-pointer mx-1"
+                    <td>
+                        <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs md:text-sm">
+                            Đã đăng
+                        </span>
+                    </td>
+
+                    <!-- ICON RESPONSIVE -->
+                    <td class="text-center text-lg flex md:block justify-center gap-3 py-2">
+                        <i class="ri-chat-history-line text-blue-500 cursor-pointer"
                            onclick="openComments(<?= $p['post_id'] ?>)"></i>
 
-                        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer mx-1"
+                        <i class="ri-delete-bin-6-line text-red-500 cursor-pointer"
                            onclick="deletePost(<?= $p['post_id'] ?>)"></i>
                     </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
+
     </div>
 </div>
 
-
 <!-- POPUP BÌNH LUẬN -->
 <div id="commentPopup"
-     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white w-[600px] max-h-[80vh] rounded-lg shadow p-5 overflow-y-auto">
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white w-full max-w-[600px] max-h-[80vh] rounded-lg shadow p-4 md:p-5 overflow-y-auto">
         <h2 class="text-xl font-bold mb-4">Danh sách bình luận</h2>
 
         <div id="commentList" class="space-y-3"></div>
 
         <button onclick="closePopup()" 
-                class="mt-4 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+                class="mt-4 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 w-full md:w-auto">
             Đóng
         </button>
     </div>
