@@ -43,6 +43,23 @@ $journals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
+<style>
+  .line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+  </style>
 <body style="background: linear-gradient(to right, #00c8ffb2, #006ef5c0)";>
 <?php include "navbar.php"; ?>
 
@@ -66,25 +83,31 @@ $journals = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </button>
   </div>
 
-  <div id="journalList" class="space-y-4">
+  <div id="journalList"
+  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
     <?php foreach($journals as $j): ?>
-      <div class="bg-white p-4 rounded-xl shadow-md cursor-pointer flex items-center justify-between journal-item"
+      <div
+  class="journal-item bg-white p-4 rounded-xl shadow-md cursor-pointer flex flex-col gap-3 h-full"
            data-id="<?= $j['journal_id'] ?>"
            data-title="<?= htmlspecialchars($j['title']) ?>"
            data-content="<?= htmlspecialchars($j['content']) ?>"
            data-date="<?= $j['journal_date'] ?>"
            data-icon="<?= htmlspecialchars($j['icon']) ?>">
-        <div class="flex items-center gap-3">
-          <div class="text-2xl"><?= htmlspecialchars($j['icon']) ?></div>
-          <div>
-            <h4 class="font-semibold text-gray-800"><?= htmlspecialchars($j['title']) ?></h4>
-            <p class="text-gray-500 text-sm"><?= date("d/m/Y", strtotime($j['journal_date'])) ?></p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="text-gray-400 hover:text-gray-600 cursor-pointer view-btn">➡️</div>
-          <div class="text-red-500 hover:text-red-700 cursor-pointer delete-btn">🗑️</div>
-        </div>
+       <div class="flex items-center gap-3">
+  <div class="text-3xl"><?= htmlspecialchars($j['icon']) ?></div>
+  <div>
+    <h4 class="font-semibold text-gray-800 line-clamp-1">
+      <?= htmlspecialchars($j['title']) ?>
+    </h4>
+    <p class="text-gray-500 text-sm">
+      <?= date("d/m/Y", strtotime($j['journal_date'])) ?>
+    </p>
+  </div>
+</div>
+        <div class="flex justify-end items-center gap-3 mt-auto">
+  <div class="text-gray-400 hover:text-gray-600 cursor-pointer view-btn">➡️</div>
+  <div class="text-red-500 hover:text-red-700 cursor-pointer delete-btn">🗑️</div>
+</div>
       </div>
     <?php endforeach; ?>
   </div>
@@ -234,24 +257,25 @@ journalForm.addEventListener("submit", async function(e){
     if(data.success){
         const j = data.journal;
         const div = document.createElement("div");
-        div.className = "bg-white p-4 rounded-xl shadow-md cursor-pointer flex items-center justify-between journal-item";
+        div.className =
+  "journal-item bg-white p-4 rounded-xl shadow-md cursor-pointer flex flex-col gap-3 h-full";
         div.dataset.id = j.id;
         div.dataset.title = j.title;
         div.dataset.content = j.content;
         div.dataset.date = j.journal_date;
         div.dataset.icon = j.icon;
         div.innerHTML = `
-          <div class="flex items-center gap-3">
-            <div class="text-2xl">${j.icon}</div>
-            <div>
-              <h4 class="font-semibold text-gray-800">${j.title}</h4>
-              <p class="text-gray-500 text-sm">${new Date(j.journal_date).toLocaleDateString()}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="text-gray-400 hover:text-gray-600 cursor-pointer view-btn">➡️</div>
-            <div class="text-red-500 hover:text-red-700 cursor-pointer delete-btn">🗑️</div>
-          </div>
+         <div class="flex items-center gap-3">
+  <div class="text-3xl">${j.icon}</div>
+  <div>
+    <h4 class="font-semibold text-gray-800 line-clamp-1">${j.title}</h4>
+    <p class="text-gray-500 text-sm">${new Date(j.journal_date).toLocaleDateString()}</p>
+  </div>
+</div>
+<div class="flex justify-end gap-3 mt-auto">
+  <div class="text-gray-400 hover:text-gray-600 cursor-pointer view-btn">➡️</div>
+  <div class="text-red-500 hover:text-red-700 cursor-pointer delete-btn">🗑️</div>
+</div>
         `;
         document.getElementById("journalList").prepend(div);
         attachEvents(div);
