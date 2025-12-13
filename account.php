@@ -1,223 +1,187 @@
 <?php
 session_start();
 
-// Nếu chưa đăng nhập → chuyển về trang đăng nhập
 if (!isset($_SESSION["user_id"])) {
-  header("Location: dangnhap.php");
-  exit();
+    header("Location: dangnhap.php");
+    exit();
 }
 
-// Lấy username từ session
-$username = $_SESSION["username"];
+include "config.php";
+
+$user_id = $_SESSION["user_id"];
+
+/* =========================
+   LẤY THÔNG TIN USER
+========================= */
+$stmt = $pdo->prepare("SELECT username, email, password FROM users WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+/* =========================
+   CẬP NHẬT THÔNG TIN
+========================= */
+if (isset($_POST["update_profile"])) {
+    $new_username = trim($_POST["username"]);
+    $new_email    = trim($_POST["email"]);
+
+    if ($new_username !== "" && $new_email !== "") {
+        $stmt = $pdo->prepare(
+            "UPDATE users SET username = ?, email = ? WHERE user_id = ?"
+        );
+        $stmt->execute([$new_username, $new_email, $user_id]);
+
+        $_SESSION["username"] = $new_username;
+        $_SESSION["success"]  = "Cập nhật thông tin thành công 🎉";
+
+        header("Location: account.php");
+        exit();
+    }
+}
+
+/* =========================
+   ĐỔI MẬT KHẨU
+========================= */
+if (isset($_POST["change_password"])) {
+    $old     = $_POST["old_password"];
+    $new     = $_POST["new_password"];
+    $confirm = $_POST["confirm_password"];
+
+    if (!password_verify($old, $user["password"])) {
+        $_SESSION["error"] = "Mật khẩu hiện tại không đúng ❌";
+    } elseif ($new !== $confirm) {
+        $_SESSION["error"] = "Xác nhận mật khẩu không khớp ❌";
+    } else {
+        $hash = password_hash($new, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare(
+            "UPDATE users SET password = ? WHERE user_id = ?"
+        );
+        $stmt->execute([$hash, $user_id]);
+
+        $_SESSION["success"] = "Đổi mật khẩu thành công 🔐";
+    }
+
+    header("Location: account.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tài Khoản | Habitu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
 
-<body style="background: linear-gradient(to right, #00c8ffb2, #006ef5c0)" ;>
+<body style="background: linear-gradient(to right, #00c8ffb2, #006ef5c0);">
 
-  <?php include "navbar.php"; ?>
+<?php include "navbar.php"; ?>
 
-
-  <!-- PAGE TITLE -->
-  <!-- Header -->
-
-  <div class="mb-6 text-center mt-10">
-
-    <h1 class="text-2xl font-bold text-white leading-loose">
-      Tài Khoản Cá Nhân 🐱
+<!-- TIÊU ĐỀ -->
+<div class="mb-6 text-center mt-10">
+    <h1 class="text-2xl font-bold text-white">
+        Tài Khoản Cá Nhân 🐱
     </h1>
-
-    <p class="text-sm text-white leading-relaxed">
-      Cập nhật thông tin và bảo mật tài khoản của bạn ✨
+    <p class="text-sm text-white mt-2">
+        Cập nhật thông tin và bảo mật tài khoản của bạn ✨
     </p>
-  </div>
+</div>
 
-  <!-- MAIN CONTENT -->
-  <div class="max-w-4xl mx-auto px-6 space-y-6 pb-16">
+<div class="max-w-4xl mx-auto px-6 space-y-6 pb-16">
 
-    <!-- Hồ sơ cá nhân -->
-    <div class="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-6">
-      <h3 class="text-lg font-semibold mb-4 flex gap-2">
-        <i class="fas fa-id-card text-blue-500"></i> Hồ Sơ Cá Nhân
-      </h3>
+    <!-- HỒ SƠ CÁ NHÂN -->
+    <form method="post" class="bg-white/80 shadow-lg rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-4 flex gap-2">
+            <i class="fas fa-id-card text-blue-500"></i> Hồ Sơ Cá Nhân
+        </h3>
 
-      <label class="text-sm font-medium">Tên hiển thị</label>
-      <input type="text" class="w-full mt-1 mb-4 p-2 border rounded-lg" placeholder="Người dùng">
+        <label class="text-sm font-medium">Tên hiển thị</label>
+        <input type="text" name="username"
+               value="<?= htmlspecialchars($user["username"]) ?>"
+               class="w-full mt-1 mb-4 p-2 border rounded-lg">
 
-      <label class="text-sm font-medium">Email</label>
-      <input type="email" class="w-full mt-1 mb-4 p-2 border rounded-lg" placeholder="user@example.com">
+        <label class="text-sm font-medium">Email</label>
+        <input type="email" name="email"
+               value="<?= htmlspecialchars($user["email"]) ?>"
+               class="w-full mt-1 mb-4 p-2 border rounded-lg">
 
-      <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-        Cập Nhật Thông Tin
-      </button>
-    </div>
+        <button name="update_profile"
+                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+            Cập Nhật Thông Tin
+        </button>
+    </form>
 
+    <!-- ĐỔI MẬT KHẨU -->
+    <form method="post" class="bg-white/80 shadow-lg rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-4 flex gap-2">
+            <i class="fas fa-lock text-orange-500"></i> Đổi Mật Khẩu
+        </h3>
 
-    <!-- Đổi mật khẩu -->
-    <div class="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-6">
-      <h3 class="text-lg font-semibold mb-4 flex gap-2">
-        <i class="fas fa-lock text-orange-500"></i> Đổi Mật Khẩu
-      </h3>
+        <label class="text-sm font-medium">Mật khẩu hiện tại</label>
+        <input type="password" name="old_password"
+               class="w-full mt-1 mb-3 p-2 border rounded-lg">
 
-      <label class="text-sm font-medium">Mật khẩu hiện tại</label>
-      <input type="password" class="w-full mt-1 mb-3 p-2 border rounded-lg">
+        <label class="text-sm font-medium">Mật khẩu mới</label>
+        <input type="password" name="new_password"
+               class="w-full mt-1 mb-3 p-2 border rounded-lg">
 
-      <label class="text-sm font-medium">Mật khẩu mới</label>
-      <input type="password" class="w-full mt-1 mb-3 p-2 border rounded-lg">
+        <label class="text-sm font-medium">Xác nhận mật khẩu mới</label>
+        <input type="password" name="confirm_password"
+               class="w-full mt-1 mb-4 p-2 border rounded-lg">
 
-      <label class="text-sm font-medium">Xác nhận mật khẩu mới</label>
-      <input type="password" class="w-full mt-1 mb-4 p-2 border rounded-lg">
+        <button name="change_password"
+                class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
+            Đổi Mật Khẩu
+        </button>
+    </form>
 
-      <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
-        Đổi Mật Khẩu
-      </button>
-    </div>
+</div>
 
+<?php include "footer.php"; ?>
 
-    <!-- Thông báo -->
-    <div class="bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-6">
-      <h3 class="text-lg font-semibold mb-4 flex gap-2">
-        <i class="fas fa-bell text-purple-500"></i> Thông Báo
-      </h3>
+<!-- ===================== POP-UP Ở GIỮA MÀN HÌNH ===================== -->
+<script>
+function showPopup(message, type="success") {
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.3)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "9999";
 
-      <!-- notification -->
-      <div class="flex justify-between py-3 border-b">
-        <span>Thông báo đẩy</span>
-        <label class="switch">
-          <input type="checkbox">
-          <span class="slider"></span>
-        </label>
-      </div>
+    const popup = document.createElement("div");
+    popup.textContent = message;
+    popup.className = `px-6 py-4 rounded-lg shadow-lg text-white text-center text-lg transition-all duration-500
+                       ${type === "success" ? "bg-green-500" : "bg-red-500"}`;
 
-      <div class="flex justify-between py-3">
-        <span>Thông báo email</span>
-        <label class="switch">
-          <input type="checkbox">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
 
-  </div>
+    // tự động biến mất sau 3 giây
+    setTimeout(() => {
+        overlay.style.opacity = '0';
+        overlay.style.transition = "opacity 0.5s";
+        setTimeout(() => overlay.remove(), 500);
+    }, 3000);
+}
 
+<?php if(isset($_SESSION["success"])): ?>
+    showPopup("<?= $_SESSION['success'] ?>", "success");
+    <?php unset($_SESSION["success"]); ?>
+<?php endif; ?>
 
-  <!-- CUSTOM SWITCH STYLE -->
-  <style>
-    .switch {
-      position: relative;
-      width: 46px;
-      height: 24px;
-      display: inline-block;
-    }
+<?php if(isset($_SESSION["error"])): ?>
+    showPopup("<?= $_SESSION['error'] ?>", "error");
+    <?php unset($_SESSION["error"]); ?>
+<?php endif; ?>
+</script>
 
-    .switch input {
-      display: none;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      background-color: #ccc;
-      border-radius: 34px;
-      inset: 0;
-      transition: .4s;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      border-radius: 50%;
-      transition: .4s;
-    }
-
-    input:checked+.slider {
-      background-color: #4ade80;
-    }
-
-    input:checked+.slider:before {
-      transform: translateX(22px);
-    }
-  </style>
-
-
-  <!-- FOOTER -->
-  <footer class="mt-10 bg-gradient-to-r from-purple-600 to-pink-500 text-white py-10 px-8 rounded-t-3xl">
-
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
-
-      <!-- Logo + mô tả -->
-      <div>
-        <div class="flex items-center gap-3 mb-3">
-          <img src="assets/logo_habitu.png" width="40" class="rounded-full" />
-          <h2 class="text-xl font-bold">Habitu</h2>
-        </div>
-        <p class="text-sm leading-relaxed">
-          Xây dựng thói quen lành mạnh cùng Habitu! 🐱✨
-        </p>
-
-        <!-- Social icons -->
-        <div class="flex gap-4 mt-4 text-xl">
-          <a href="#" class="hover:text-yellow-300"><i class="fab fa-facebook"></i></a>
-          <a href="#" class="hover:text-yellow-300"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="hover:text-yellow-300"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="hover:text-yellow-300"><i class="fab fa-youtube"></i></a>
-        </div>
-      </div>
-
-      <!-- Liên kết nhanh -->
-      <div>
-        <h3 class="text-lg font-semibold mb-3">Liên Kết Nhanh</h3>
-        <ul class="space-y-2 text-sm">
-          <li><a href="dashboard.php" class="hover:text-yellow-300">Trang Chủ</a></li>
-          <li><a href="journal.php" class="hover:text-yellow-300">Nhật Ký</a></li>
-          <li><a href="community.php" class="hover:text-yellow-300">Cộng Đồng</a></li>
-          <li><a href="thongke.php" class="hover:text-yellow-300">Thống Kê</a></li>
-        </ul>
-      </div>
-
-      <!-- Tài nguyên -->
-      <div>
-        <h3 class="text-lg font-semibold mb-3">Tài Nguyên</h3>
-        <ul class="space-y-2 text-sm">
-          <li><a href="index.php" class="hover:text-yellow-300">Hướng Dẫn Sử Dụng</a></li>
-          <li><a href="#" class="hover:text-yellow-300">Blog</a></li>
-          <li><a href="#" class="hover:text-yellow-300">Câu Hỏi Thường Gặp</a></li>
-          <li><a href="support.php" class="hover:text-yellow-300">Hỗ Trợ</a></li>
-        </ul>
-      </div>
-
-      <!-- Liên hệ -->
-      <div>
-        <h3 class="text-lg font-semibold mb-3">Liên Hệ</h3>
-
-        <p class="text-sm flex items-center gap-2">
-          <i class="fas fa-envelope"></i> support@habitu.com
-        </p>
-
-        <p class="text-sm mt-3">Giờ làm việc:</p>
-        <p class="text-sm">T2 - T6: 9:00 - 18:00</p>
-      </div>
-
-    </div>
-
-    <!-- Dòng cuối -->
-    <div class="text-center text-xs mt-10 opacity-80">
-      © 2025 Habitu. Tất cả quyền được bảo lưu. |
-      <a href="#" class="hover:text-yellow-300">Chính Sách Bảo Mật</a> •
-      <a href="#" class="hover:text-yellow-300">Điều Khoản Sử Dụng</a>
-      <br>
-      <div class="mt-2 flex justify-center items-center gap-1">
-        Made with ❤️ by TMeo
-      </div>
-    </div>
-
-  </footer>
 </body>
-
 </html>

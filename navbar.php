@@ -1,3 +1,12 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$username = $_SESSION["username"] ?? "User";
+?>
+
+
 <!-- NAV -->
 <head>
   <meta charset="UTF-8">
@@ -46,7 +55,7 @@
     <div class="hidden md:block relative group">
       <button class="flex items-center gap-2">
         <i class="fas fa-user-circle text-xl"></i>
-        <span><?php echo htmlspecialchars($username); ?></span>
+        <span><?= htmlspecialchars($username) ?></span>
         <i class="fas fa-chevron-down text-sm"></i>
       </button>
 
