@@ -1,78 +1,114 @@
 <?php
 session_start();
-
 if (!isset($_SESSION["user_id"])) {
     header("Location: dangnhap.php");
     exit();
 }
 
-include "config.php"; 
+include "config.php";
 
-$user_id = $_SESSION["user_id"];
+$user_id  = $_SESSION["user_id"];
 $username = $_SESSION["username"];
+$today    = date('Y-m-d');
 
-// Lấy tất cả thói quen của user
+/* =========================
+   LẤY DANH SÁCH THÓI QUEN
+========================= */
 $stmt = $pdo->prepare("SELECT * FROM habit WHERE user_id=?");
 $stmt->execute([$user_id]);
 $habits = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 $total_habits = count($habits);
 
-// Streak hiện tại
-$streak = 0;
-foreach ($habits as $habit) {
-    if ($habit['current_streak'] > $streak) $streak = $habit['current_streak'];
-}
-
-// Hiệu suất: tổng số log done / tổng số thói quen
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM habit_logs WHERE user_id=? AND completed='done'");
+/* =========================
+   STREAK CỦA USER
+========================= */
+$stmt = $pdo->prepare("SELECT total_streak FROM users WHERE user_id=?");
 $stmt->execute([$user_id]);
-$total_done = $stmt->fetchColumn();
-$efficiency = $total_habits > 0 ? round($total_done / $total_habits * 100) : 0;
+$streak = (int)$stmt->fetchColumn();
 
-// -------- TẠO LOG HÔM NAY NẾU CHƯA CÓ --------
-$today = date('Y-m-d');
+
+/* =========================
+   TẠO LOG HÔM NAY (NẾU CHƯA CÓ)
+========================= */
+$stmtCheck = $pdo->prepare("
+    SELECT habit_id 
+    FROM habit_logs 
+    WHERE user_id=? AND log_date=?
+");
+$stmtCheck->execute([$user_id, $today]);
+$loggedHabits = $stmtCheck->fetchAll(PDO::FETCH_COLUMN);
+
+$stmtInsert = $pdo->prepare("
+    INSERT INTO habit_logs(user_id, habit_id, log_date, completed)
+    VALUES (?, ?, ?, 0)
+");
+
 foreach ($habits as $habit) {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM habit_logs WHERE user_id=? AND habit_id=? AND log_date=?");
-    $stmt->execute([$user_id, $habit['habit_id'], $today]);
-    if ($stmt->fetchColumn() == 0) {
-        // Chưa có log hôm nay → tạo log chưa hoàn thành
-        $stmt_insert = $pdo->prepare("INSERT INTO habit_logs(user_id, habit_id, log_date, completed) VALUES (?, ?, ?, '')");
-        $stmt_insert->execute([$user_id, $habit['habit_id'], $today]);
+    if (!in_array($habit['habit_id'], $loggedHabits)) {
+        $stmtInsert->execute([$user_id, $habit['habit_id'], $today]);
     }
 }
 
-// Bar Chart
-$bar_labels = [];
-$bar_data = [];
-foreach ($habits as $habit) {
-    $bar_labels[] = $habit['habit_name'];
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM habit_logs WHERE habit_id=? AND user_id=? AND completed='done'");
-    $stmt->execute([$habit['habit_id'], $user_id]);
-    $bar_data[] = $stmt->fetchColumn();
-}
-
-// Pie Chart (hôm nay)
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM habit_logs WHERE user_id=? AND log_date=? AND completed='done'");
+/* =========================
+   THỐNG KÊ HÔM NAY
+========================= */
+$stmt = $pdo->prepare("
+    SELECT 
+        COUNT(*) AS total,
+        SUM(completed = 1) AS done
+    FROM habit_logs
+    WHERE user_id=? AND log_date=?
+");
 $stmt->execute([$user_id, $today]);
-$done_today = $stmt->fetchColumn();
+$todayStat = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM habit_logs WHERE user_id=? AND log_date=?");
-$stmt->execute([$user_id, $today]);
-$total_today = $stmt->fetchColumn();
-
+$total_today = (int)$todayStat['total'];
+$done_today  = (int)$todayStat['done'];
 $not_done_today = $total_today - $done_today;
 
-// Line Chart tuần
+$efficiency = $total_today > 0
+    ? round($done_today / $total_today * 100)
+    : 0;
+
+/* =========================
+   BAR CHART (THEO HABIT)
+========================= */
+$stmt = $pdo->prepare("
+    SELECT habit_id, COUNT(*) AS total_done
+    FROM habit_logs
+    WHERE user_id=? AND completed='done'
+    GROUP BY habit_id
+");
+$stmt->execute([$user_id]);
+$doneMap = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+$bar_labels = [];
+$bar_data   = [];
+foreach ($habits as $h) {
+    $bar_labels[] = $h['habit_name'];
+    $bar_data[]   = $doneMap[$h['habit_id']] ?? 0;
+}
+
+/* =========================
+   LINE CHART (7 NGÀY)
+========================= */
 $week_days = [];
 $week_data = [];
-for ($i = 6; $i >= 0; $i--) {
-    $day = date('Y-m-d', strtotime("-$i day"));
-    $week_days[] = date('D', strtotime($day));
 
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM habit_logs WHERE user_id=? AND log_date=? AND completed='done'");
-    $stmt->execute([$user_id, $day]);
-    $week_data[] = $stmt->fetchColumn();
+$stmt = $pdo->prepare("
+    SELECT log_date, COUNT(*) AS done
+    FROM habit_logs
+    WHERE user_id=? AND completed='done'
+      AND log_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND CURDATE()
+    GROUP BY log_date
+");
+$stmt->execute([$user_id]);
+$weekMap = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+for ($i = 6; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i day"));
+    $week_days[] = date('D', strtotime($date));
+    $week_data[] = $weekMap[$date] ?? 0;
 }
 ?>
 
@@ -112,7 +148,7 @@ for ($i = 6; $i >= 0; $i--) {
       <div class="p-4 bg-purple-100 rounded-xl flex items-center gap-3">
         <i class="fa-solid fa-bolt text-purple-700 text-xl"></i>
         <div>
-          <p class="text-sm text-gray-600">Streak hiện tại</p>
+          <p class="text-sm text-gray-600">Streak </p>
           <p class="font-bold text-lg"><?= $streak ?> ngày</p>
         </div>
       </div>
@@ -169,45 +205,43 @@ for ($i = 6; $i >= 0; $i--) {
 
   </div>
 </section>
-
 <script>
-  new Chart(document.getElementById("barChart"), {
-    type: "bar",
-    data: {
-      labels: <?= json_encode($bar_labels) ?>,
-      datasets: [{
-        label: "Số ngày duy trì",
-        data: <?= json_encode($bar_data) ?>,
-        backgroundColor: ["#14b8a6", "#3b82f6", "#f97316"]
-      }]
-    },
-    options: { responsive: true }
-  });
+new Chart(barChart, {
+  type: "bar",
+  data: {
+    labels: <?= json_encode($bar_labels) ?>,
+    datasets: [{
+      label: "Số ngày hoàn thành",
+      data: <?= json_encode($bar_data) ?>,
+      backgroundColor: "#14b8a6"
+    }]
+  }
+});
 
-  new Chart(document.getElementById("pieChart"), {
-    type: "pie",
-    data: {
-      labels: ["Đã hoàn thành", "Chưa hoàn thành"],
-      datasets: [{
-        data: [<?= $done_today ?>, <?= $not_done_today ?>],
-        backgroundColor: ["#10b981", "#f97316"]
-      }]
-    }
-  });
+new Chart(pieChart, {
+  type: "pie",
+  data: {
+    labels: ["Đã hoàn thành", "Chưa hoàn thành"],
+    datasets: [{
+      data: [<?= $done_today ?>, <?= $not_done_today ?>],
+      backgroundColor: ["#10b981", "#f97316"]
+    }]
+  }
+});
 
-  new Chart(document.getElementById("lineChart"), {
-    type: "line",
-    data: {
-      labels: <?= json_encode($week_days) ?>,
-      datasets: [{
-        label: "Thói quen hoàn thành",
-        data: <?= json_encode($week_data) ?>,
-        borderColor: "#14b8a6",
-        fill: false,
-        tension: 0.3
-      }]
-    }
-  });
+new Chart(lineChart, {
+  type: "line",
+  data: {
+    labels: <?= json_encode($week_days) ?>,
+    datasets: [{
+      label: "Hoàn thành",
+      data: <?= json_encode($week_data) ?>,
+      borderColor: "#14b8a6",
+      tension: 0.3,
+      fill: false
+    }]
+  }
+});
 </script>
 
 </body>
