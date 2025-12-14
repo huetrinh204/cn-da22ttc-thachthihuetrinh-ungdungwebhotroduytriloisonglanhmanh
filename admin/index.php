@@ -189,26 +189,81 @@ if (isset($_GET["loadHabitUser"])) {
 
     <script>
         // Chart người dùng
-        new Chart(document.getElementById("userChart"), {
-            type: 'line',
-            data: { labels: <?= json_encode($userDays) ?>, datasets: [{ label: 'Người dùng mới', data: <?= json_encode($userCounts) ?>, borderWidth: 2, tension: 0.3 }] }
-        });
+       new Chart(document.getElementById("userChart"), {
+    type: 'line',
+    data: {
+        labels: <?= json_encode($userDays) ?>,
+        datasets: [{
+            label: 'Người dùng mới',
+            data: <?= json_encode($userCounts) ?>,
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,     // ✅ chỉ hiển thị số nguyên
+                    precision: 0
+                }
+            }
+        }
+    }
+});
 
         // Chart bài viết
-        new Chart(document.getElementById("postChart"), {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode($postDays) ?>,
-                datasets: [{ label: 'Bài viết', data: <?= json_encode($postCounts) ?>, backgroundColor: 'pink', borderWidth: 2 }]
-            },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
-        });
+       new Chart(document.getElementById("postChart"), {
+    type: 'bar',
+    data: {
+        labels: <?= json_encode($postDays) ?>,
+        datasets: [{
+            label: 'Bài viết',
+            data: <?= json_encode($postCounts) ?>,
+            backgroundColor: 'pink',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                    precision: 0
+                }
+            }
+        }
+    }
+});
 
         // Chart bình luận
-        new Chart(document.getElementById("commentChart"), {
-            type: 'bar',
-            data: { labels: <?= json_encode($commentDays) ?>, datasets: [{ label: 'Bình luận', data: <?= json_encode($commentCounts) ?>, borderWidth: 2 }] }
-        });
+       new Chart(document.getElementById("commentChart"), {
+    type: 'bar',
+    data: {
+        labels: <?= json_encode($commentDays) ?>,
+        datasets: [{
+            label: 'Bình luận',
+            data: <?= json_encode($commentCounts) ?>,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                    precision: 0
+                }
+            }
+        }
+    }
+});
 
         // Chart thói quen theo tuần (line chart, y = số nguyên)
         let habitChartInstance = null;
