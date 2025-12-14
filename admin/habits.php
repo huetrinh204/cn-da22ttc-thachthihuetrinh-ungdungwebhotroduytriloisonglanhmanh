@@ -72,18 +72,29 @@ if (isset($_GET['search']) && $_GET['search'] !== '') {
 // Lọc thói quen mẫu (admin tạo)
 if (isset($_GET['filter']) && $_GET['filter'] === 'sample') {
     $where[] = "status = 'Mẫu'";
-    $where[] = "user_id = ?";
+    $where[] = "h.user_id = ?";
     $params[] = $user_id; // admin hiện tại
 }
 
-$sql = "SELECT * FROM habit";
+$sql = "
+SELECT 
+    h.*,
+    hl.completed
+FROM habit h
+LEFT JOIN habit_logs hl 
+    ON h.habit_id = hl.habit_id
+    AND hl.log_date = CURDATE()
+";
+
 if (!empty($where)) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
-$sql .= " ORDER BY created_hb DESC";
+
+$sql .= " ORDER BY h.created_hb DESC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
+
 ?>
 
 
@@ -118,8 +129,6 @@ $stmt->execute($params);
 
 
 
-//$stmtCompleted = $pdo->query("SELECT COUNT(*) AS total_completed FROM habit_completed");
-//$totalCompleted = $stmtCompleted->fetch(PDO::FETCH_ASSOC)['total_completed'] ?? 0;
     ?>
 
     <!-- Tổng quan -->
@@ -154,33 +163,31 @@ $stmt->execute($params);
             <!-- Form tìm kiếm -->
             <form method="GET" class="flex flex-wrap gap-3 w-full items-center">
 
-    <input type="text" name="search" placeholder="🔍 Tìm kiếm thói quen..."
-        class="border border-gray-300 px-4 py-2 rounded-lg flex-1"
-        value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
+                <input type="text" name="search" placeholder="🔍 Tìm kiếm thói quen..."
+                    class="border border-gray-300 px-4 py-2 rounded-lg flex-1"
+                    value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
 
-    <button type="submit"
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-        <i class="ri-search-line"></i> Tìm
-    </button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                    <i class="ri-search-line"></i> Tìm
+                </button>
 
-    <!-- NÚT MẪU -->
-    <a href="habits.php?filter=sample"
-        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
-        <i class="ri-bookmark-line"></i> Mẫu
-    </a>
+                <!-- NÚT MẪU -->
+                <a href="habits.php?filter=sample"
+                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+                    <i class="ri-bookmark-line"></i> Mẫu
+                </a>
 
-    <!-- TẤT CẢ -->
-    <a href="habits.php"
-        class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition">
-        Tất cả
-    </a>
+                <!-- TẤT CẢ -->
+                <a href="habits.php" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition">
+                    Tất cả
+                </a>
 
-    <button id="createHabitBtn" type="button"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold ml-auto">
-        + Tạo Thói Quen Mẫu
-    </button>
+                <button id="createHabitBtn" type="button"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold ml-auto">
+                    + Tạo Thói Quen Mẫu
+                </button>
 
-</form>
+            </form>
 
 
         </div>
@@ -513,25 +520,33 @@ $stmt->execute($params);
                         <th>Thói quen</th>
                         <th>Mô tả</th>
                         <th>Người tạo</th>
-                        <th>Người dùng</th>
+                        <th>Ngày tạo</th>
                         <th>Hoàn thành</th>
-                        <th>Streak TB</th>
+                       
                         <th class="text-center">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    $habits = $stmt->fetchAll(PDO::FETCH_ASSOC); // lấy tất cả kết quả
-                    
+                    $habits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                     if (count($habits) > 0) {
                         foreach ($habits as $row) {
+
                             echo "<tr class='border-b hover:bg-gray-50'>";
+
+                            // Thói quen
                             echo "<td class='flex items-center gap-2 py-2'>
-                <div class='w-8 h-8 bg-blue-400 text-white rounded-full flex items-center justify-center font-bold' 
-                     style='font-family: \"Segoe UI Emoji\", \"Apple Color Emoji\", \"Noto Color Emoji\", sans-serif;'>{$row['icon']}</div>
+                <div class='w-8 h-8 bg-blue-400 text-white rounded-full flex items-center justify-center font-bold'>
+                    {$row['icon']}
+                </div>
                 {$row['habit_name']}
               </td>";
+
+                            // Mô tả
                             echo "<td>{$row['description']}</td>";
+
+                            // Người tạo
                             echo "<td>";
                             if ($row['user_id'] == 17) {
                                 echo "System";
@@ -542,21 +557,33 @@ $stmt->execute($params);
                                 echo $user ? $user['username'] : "Không tìm thấy";
                             }
                             echo "</td>";
-                            echo "<td>---</td>";
-                            echo "<td>---</td>";
-                            echo "<td>---</td>";
+
+                            // Ngày tạo
+                            echo "<td>" . date("d/m/Y", strtotime($row['created_hb'])) . "</td>";
+
+                            // Hoàn thành (Done / Missed)
+                            
+                            if ($row['completed'] == 'done') {
+                                echo "<td class='text-green-600 font-semibold'>Done</td>";
+                            } else {
+                                echo "<td class='text-red-500 font-semibold'>Missed</td>";
+                            };
+
+                            // Hành động
                             echo "<td class='text-center text-lg'>
-                <button class='edit-btn text-blue-500 mx-1' 
-                        data-id='{$row['habit_id']}' 
-                        data-name='" . htmlspecialchars($row['habit_name'], ENT_QUOTES) . "' 
-                        data-desc='" . htmlspecialchars($row['description'], ENT_QUOTES) . "' 
+                <button class='edit-btn text-blue-500 mx-1'
+                        data-id='{$row['habit_id']}'
+                        data-name='" . htmlspecialchars($row['habit_name'], ENT_QUOTES) . "'
+                        data-desc='" . htmlspecialchars($row['description'], ENT_QUOTES) . "'
                         data-icon='" . htmlspecialchars($row['icon'], ENT_QUOTES) . "'>
-                    <i class='ri-edit-2-line cursor-pointer'></i>
+                    <i class='ri-edit-2-line'></i>
                 </button>
-                <button class='delete-btn text-red-500 mx-1' data-id='{$row['habit_id']}'>
-                    <i class='ri-delete-bin-6-line cursor-pointer'></i>
+                <button class='delete-btn text-red-500 mx-1'
+                        data-id='{$row['habit_id']}'>
+                    <i class='ri-delete-bin-6-line'></i>
                 </button>
               </td>";
+
                             echo "</tr>";
                         }
                     } else {
@@ -564,6 +591,7 @@ $stmt->execute($params);
 
                     }
                     ?>
+
                 </tbody>
 
             </table>
