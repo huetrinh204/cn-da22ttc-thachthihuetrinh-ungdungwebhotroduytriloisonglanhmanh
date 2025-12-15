@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Khởi tạo biến lưu giá trị input
-$username = $email = $password = $confirm = $gender = $tel = "";
+$username = $email = $password = $confirm = $gender = $tel = $health_goal = "";
 $popup = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $confirm = $_POST["confirm_password"];
   $gender = $_POST["gender"];
   $tel = $_POST["tel"];
+  $health_goal = $_POST["health_goal"] ?? "";
 
   // Kiểm tra mật khẩu >=6 ký tự
   if (strlen($password) < 6) {
@@ -33,17 +34,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Mã hóa mật khẩu
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        $sql = "INSERT INTO users (username, email, password, gender, tel, role, create_acc)
-                        VALUES (:username, :email, :password, :gender, :tel, 'user', NOW())";
+        $sql = "INSERT INTO users 
+        (username, email, password, gender, tel, health_goal, role, create_acc)
+        VALUES 
+        (:username, :email, :password, :gender, :tel, :health_goal, 'user', NOW())";
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-          ":username" => $username,
-          ":email" => $email,
-          ":password" => $hashedPassword,
-          ":gender" => $gender,
-          ":tel" => $tel
-        ]);
-
+  ":username" => $username,
+  ":email" => $email,
+  ":password" => $hashedPassword,
+  ":gender" => $gender,
+  ":tel" => $tel,
+  ":health_goal" => $health_goal
+]);
         $popup = "Đăng ký thành công!";
         $success = true; // đánh dấu thành công
       }
@@ -235,8 +239,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <label>Giới tính</label>
         <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 16px;">
-          <label><input type="radio" name="gender" value="Nam" <?= ($gender == "Nam") ? "checked" : "" ?> required> Nam</label>
-          <label><input type="radio" name="gender" value="Nữ" <?= ($gender == "Nữ") ? "checked" : "" ?> required> Nữ</label>
+          <label><input type="radio" name="gender" value="Nam" <?= ($gender == "Nam") ? "checked" : "" ?> required>
+            Nam</label>
+          <label><input type="radio" name="gender" value="Nữ" <?= ($gender == "Nữ") ? "checked" : "" ?> required>
+            Nữ</label>
           <label><input type="radio" name="gender" value="Khác" <?= ($gender == "Khác") ? "checked" : "" ?> required>
             Khác</label>
         </div>
@@ -244,6 +250,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="tel">Số điện thoại</label>
         <input id="tel" type="tel" name="tel" pattern="[0-9]{10}" placeholder="0123456789" required
           value="<?= htmlspecialchars($tel) ?>">
+        <label for="health_goal">Mục tiêu sức khoẻ</label>
+        <textarea id="health_goal" name="health_goal" rows="1"
+          placeholder="VD: Tập thể dục mỗi ngày,..." style="width:94%; padding:10px; margin-bottom:15px;
+         border-radius:6px; border:1px solid #ccc;
+         font-size:14px; resize:none;"><?= htmlspecialchars($health_goal) ?></textarea>
+
+        <small style="color:#777; display:block; margin-bottom:15px;">
+          🎯 Mục tiêu này sẽ giúp bạn có thêm động lực mỗi ngày!
+        </small>
 
         <label class="checkbox">
           <input type="checkbox" name="agree" required>

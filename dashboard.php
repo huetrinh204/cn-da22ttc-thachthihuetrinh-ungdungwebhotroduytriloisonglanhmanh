@@ -16,6 +16,12 @@ if (!isset($_SESSION["user_id"])) {
 $user_id = $_SESSION["user_id"];
 $username = $_SESSION["username"];
 
+// Lấy mục tiêu sức khoẻ của user
+$stmt = $pdo->prepare("SELECT health_goal FROM users WHERE user_id=?");
+$stmt->execute([$user_id]);
+$health_goal = $stmt->fetchColumn();
+
+
 /* ==================== LẤY DANH SÁCH THÓI QUEN ==================== */
 $stmt = $pdo->prepare("
       SELECT *, 0 AS current_streak  FROM habit 
@@ -121,27 +127,43 @@ foreach ($habits as $hb) {
   $habit_streaks[$habit_id] = (int) $stmt->fetchColumn();
 }
 
+/*==================== 5. THÔNG ĐIỆP ĐỘNG LỰC THEO TIẾN ĐỘ ====================*/
+$progress_percent = $total_habits > 0
+    ? round($completed_today / $total_habits * 100)
+    : 0;
+
+if ($progress_percent == 100) {
+    $motivation_msg = "🔥 Tuyệt vời! Hôm nay bạn đã tiến rất gần mục tiêu!";
+} elseif ($progress_percent >= 50) {
+    $motivation_msg = "✨ Bạn đang đi đúng hướng, cố thêm chút nữa nhé!";
+} elseif ($progress_percent > 0) {
+    $motivation_msg = "🌱 Mỗi bước nhỏ đều có giá trị!";
+} else {
+    $motivation_msg = "🚀 Hôm nay là một khởi đầu mới cho mục tiêu của bạn!";
+}
+
 ?>
 
 
 <!DOCTYPE html>
 <html lang="vi">
-  <style>
-/* Giới hạn dòng chữ */
-.line-clamp-1 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-}
+<style>
+  /* Giới hạn dòng chữ */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
 
-.line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
 </style>
+
 <body style="background: linear-gradient(to right, #00c8ffb2, #006ef5c0)" ;>
 
   <!-- NAV -->
@@ -159,40 +181,78 @@ foreach ($habits as $hb) {
     </p>
   </div>
 
+<?php if (!empty($health_goal)): ?>
+  <div class="fixed left-32 top-24 z-40">
 
-  <!-- Stats -->
-  <section class="stats container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-    <div class="stat-box bg-white shadow-md p-5 rounded-lg flex items-center gap-4">
-      <img style="border-radius:60%;width:50px;height:50px;" src="assets/icons/sun.png" alt="icon">
-      <div>
-        <h3 class="font-semibold">Tổng thói quen</h3>
-        <p class="text-lg font-bold"><?= $total_habits ?></p>
-      </div>
+    <div
+      class="w-30 h-30 rounded-full
+             bg-gradient-to-br from-yellow-100 to-yellow-200
+             shadow-xl flex flex-col items-center justify-center text-center
+             p-4 animate-float
+             hover:scale-105 transition-all duration-300">
+
+      <div class="text-3xl mb-1">🎯</div>
+
+      <h3 class="font-semibold text-gray-800 text-sm">
+        Mục tiêu sức khoẻ
+      </h3>
+
+      <p class="text-gray-700 text-xs mt-1 italic line-clamp-3">
+        “<?= htmlspecialchars($health_goal) ?>”
+      </p>
+
+      <span class="text-[11px] text-green-600 font-semibold mt-2">
+        Cố lên! 💪
+      </span>
+
     </div>
 
-    <div class="stat-box bg-white shadow-md p-5 rounded-lg flex items-center gap-4">
-      <img style="border-radius:60%;width:50px;height:50px;" src="assets/icons/check.png" alt="icon">
-      <div>
-        <h3 class="font-semibold">Hoàn thành hôm nay</h3>
-        <p class="text-lg font-bold">
-          <span id="completedToday"><?= $completed_today ?></span>/<?= $total_habits ?>
-          (<span id="completedPercent"><?= $total_habits ? round($completed_today / $total_habits * 100) : 0 ?></span>%)
-        </p>
-      </div>
+  </div>
+<?php endif; ?>
+
+
+
+ <!-- Stats -->
+<section
+  class="stats container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 
+         gap-6 px-4 mb-12">
+  
+  <div class="stat-box bg-white shadow-md p-5 rounded-lg flex items-center gap-4">
+    <img style="border-radius:60%;width:50px;height:50px;" src="assets/icons/sun.png" alt="icon">
+    <div>
+      <h3 class="font-semibold">Tổng thói quen</h3>
+      <p class="text-lg font-bold"><?= $total_habits ?></p>
     </div>
+  </div>
 
-    <div class="stat-box bg-white shadow-md p-5 rounded-lg flex items-center gap-4">
-      <img style="border-radius:60%;width:50px;height:50px;" src="assets/icons/streak.png" alt="icon">
-      <div>
-        <h3 class="font-semibold">Tổng chuỗi ngày</h3>
-        <p class="text-lg font-bold" id="totalStreak"><?= $total_streak ?> ngày</p>
+  <div class="stat-box bg-white shadow-md p-5 rounded-lg flex items-center gap-4">
+    <img style="border-radius:60%;width:50px;height:50px;" src="assets/icons/check.png" alt="icon">
+    <div>
+      <h3 class="font-semibold">Hoàn thành hôm nay</h3>
+      <p class="text-lg font-bold">
+        <span id="completedToday"><?= $completed_today ?></span>/<?= $total_habits ?>
+        (<span id="completedPercent"><?= $total_habits ? round($completed_today / $total_habits * 100) : 0 ?></span>%)
+      </p>
+    </div>
+  </div>
 
+  <div class="stat-box bg-white shadow-md p-5 rounded-lg flex items-center gap-4">
+    <img style="border-radius:60%;width:50px;height:50px;" src="assets/icons/streak.png" alt="icon">
+    <div>
+      <h3 class="font-semibold">Tổng chuỗi ngày</h3>
+      <p class="text-lg font-bold" id="totalStreak"><?= $total_streak ?> ngày</p>
+    </div>
+  </div>
+</section>
 
-      </div>
+<!-- Motivation -->
+<div class="pb-16">
+  <section class="container mx-auto px-4 mt-12">
+    <div class="fire-border relative rounded-xl p-4 text-center text-white">
+      <?= $motivation_msg ?>
     </div>
   </section>
-
-
+</div>
 
   <!-- Habits -->
   <section class="habits-section px-6 mt-8">
@@ -203,46 +263,41 @@ foreach ($habits as $hb) {
       </button>
     </div>
 
-    <div id="habitList"
-  class="habit-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div id="habitList" class="habit-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <?php foreach ($habits as $hb): ?>
-        <div
-  class="habit-item bg-white p-4 rounded-xl shadow-md flex flex-col gap-3 relative h-full">
+        <div class="habit-item bg-white p-4 rounded-xl shadow-md flex flex-col gap-3 relative h-full">
 
           <!-- Checkbox -->
           <div class="flex items-center justify-between">
-  <input type="checkbox"
-    class="habit-checkbox w-5 h-5"
-    data-habit-id="<?= $hb['habit_id'] ?>"
-    <?= isset($habit_logs[$hb['habit_id']]) && $habit_logs[$hb['habit_id']] === 'done' ? 'checked' : '' ?>>
+            <input type="checkbox" class="habit-checkbox w-5 h-5" data-habit-id="<?= $hb['habit_id'] ?>"
+              <?= isset($habit_logs[$hb['habit_id']]) && $habit_logs[$hb['habit_id']] === 'done' ? 'checked' : '' ?>>
 
-  <div class="text-3xl"><?= htmlspecialchars($hb['icon']) ?></div>
-</div>
+            <div class="text-3xl"><?= htmlspecialchars($hb['icon']) ?></div>
+          </div>
 
           <!-- Tên + mô tả -->
           <div>
             <h4 class="font-semibold text-gray-800 line-clamp-1"><?= htmlspecialchars($hb['habit_name']) ?></h4>
-              <p class="text-gray-500 text-sm line-clamp-2"><?= htmlspecialchars($hb['description']) ?></p>
+            <p class="text-gray-500 text-sm line-clamp-2"><?= htmlspecialchars($hb['description']) ?></p>
           </div>
 
           <!-- Chuỗi streak -->
           <div class="flex items-center justify-between mt-auto">
-  <div class="streak text-orange-400 font-semibold text-sm"></div>
+            <div class="streak text-orange-400 font-semibold text-sm"></div>
 
-  <div class="flex gap-2">
-    <button
-      onclick="openEditHabit('<?= $hb['habit_id'] ?>', '<?= htmlspecialchars($hb['habit_name']) ?>', '<?= htmlspecialchars($hb['description']) ?>', '<?= htmlspecialchars($hb['icon']) ?>')"
-      class="text-blue-600 hover:text-blue-800">
-      ✏️
-    </button>
+            <div class="flex gap-2">
+              <button
+                onclick="openEditHabit('<?= $hb['habit_id'] ?>', '<?= htmlspecialchars($hb['habit_name']) ?>', '<?= htmlspecialchars($hb['description']) ?>', '<?= htmlspecialchars($hb['icon']) ?>')"
+                class="text-blue-600 hover:text-blue-800">
+                ✏️
+              </button>
 
-    <a href="dashboard.php?delete_user_habit=<?= $hb['habit_id'] ?>"
-      onclick="return confirm('Xóa thói quen này?')"
-      class="text-red-600 hover:text-red-800">
-      🗑️
-    </a>
-  </div>
-</div>
+              <a href="dashboard.php?delete_user_habit=<?= $hb['habit_id'] ?>"
+                onclick="return confirm('Xóa thói quen này?')" class="text-red-600 hover:text-red-800">
+                🗑️
+              </a>
+            </div>
+          </div>
 
         </div>
       <?php endforeach; ?>
@@ -461,6 +516,69 @@ foreach ($habits as $hb) {
     .animate-fadeIn {
       animation: fadeIn 0.25s ease-out;
     }
+
+    @keyframes float {
+  0%, 100% {
+    transform: translateY(-50%) translateX(0);
+  }
+  50% {
+    transform: translateY(-55%) translateX(2px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+ .fire-border {
+  background: linear-gradient(to right, #22c55e, #3b82f6); /* nền dịu */
+  position: relative;
+  z-index: 1;
+}
+
+/* 🔥 viền lửa */
+.fire-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    60deg,
+    #ff6a00,
+    #ff9f00,
+    #ff4500,
+    #ff9f00,
+    #ff6a00
+  );
+  background-size: 300% 300%;
+  animation: fireBorder 4s ease-in-out infinite;
+  filter: blur(6px);
+  z-index: -1;
+}
+
+/* 🔥 glow nhẹ */
+.fire-border::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle,
+    rgba(255, 140, 0, 0.35),
+    transparent 70%
+  );
+ 
+  z-index: -2;
+  animation: fireGlow 3s ease-in-out infinite;
+}
+
+@keyframes fireBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
   </style>
 
   <!-- FOOTER -->

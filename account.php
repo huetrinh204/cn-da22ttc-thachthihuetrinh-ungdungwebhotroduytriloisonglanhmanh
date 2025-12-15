@@ -13,7 +13,11 @@ $user_id = $_SESSION["user_id"];
 /* =========================
    LẤY THÔNG TIN USER
 ========================= */
-$stmt = $pdo->prepare("SELECT username, email, password, gender, tel FROM users WHERE user_id = ?");
+$stmt = $pdo->prepare("
+    SELECT username, email, password, gender, tel, health_goal 
+    FROM users 
+    WHERE user_id = ?
+");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -25,18 +29,20 @@ if (isset($_POST["update_profile"])) {
     $new_email = trim($_POST["email"]);
     $new_gender = $_POST["gender"];
     $new_tel = trim($_POST["tel"]);
+    $new_health_goal = trim($_POST["health_goal"]);
 
     if ($new_username !== "" && $new_email !== "") {
-        $stmt = $pdo->prepare(
-            "UPDATE users 
-     SET username = ?, email = ?, gender = ?, tel = ?
-     WHERE user_id = ?"
-        );
+        $stmt = $pdo->prepare("
+            UPDATE users 
+            SET username = ?, email = ?, gender = ?, tel = ?, health_goal = ?
+            WHERE user_id = ?
+        ");
         $stmt->execute([
             $new_username,
             $new_email,
             $new_gender,
             $new_tel,
+            $new_health_goal,
             $user_id
         ]);
 
@@ -77,7 +83,6 @@ if (isset($_POST["change_password"])) {
 
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <title>Tài Khoản | Habitu</title>
@@ -87,74 +92,92 @@ if (isset($_POST["change_password"])) {
 
 <body style="background: linear-gradient(to right, #00c8ffb2, #006ef5c0);">
 
-    <?php include "navbar.php"; ?>
+<?php include "navbar.php"; ?>
 
-    <!-- TIÊU ĐỀ -->
-    <div class="mb-6 text-center mt-10">
-        <h1 class="text-2xl font-bold text-white">
-            Tài Khoản Cá Nhân 🐱
-        </h1>
-        <p class="text-sm text-white mt-2">
-            Cập nhật thông tin và bảo mật tài khoản của bạn ✨
-        </p>
-    </div>
+<!-- TIÊU ĐỀ -->
+<div class="mb-6 text-center mt-10">
+    <h1 class="text-2xl font-bold text-white">
+        Tài Khoản Cá Nhân 🐱
+    </h1>
+    <p class="text-sm text-white mt-2">
+        Cập nhật thông tin và bảo mật tài khoản của bạn ✨
+    </p>
+</div>
 
-    <div class="max-w-4xl mx-auto px-6 space-y-6 pb-16">
+<div class="max-w-4xl mx-auto px-6 space-y-6 pb-16">
 
-        <!-- HỒ SƠ CÁ NHÂN -->
-        <form method="post" class="bg-white/80 shadow-lg rounded-xl p-6">
-            <h3 class="text-lg font-semibold mb-4 flex gap-2">
-                <i class="fas fa-id-card text-blue-500"></i> Hồ Sơ Cá Nhân
-            </h3>
+<!-- HỒ SƠ CÁ NHÂN -->
+<form method="post" class="bg-white/80 shadow-lg rounded-xl p-6">
+    <h3 class="text-lg font-semibold mb-4 flex gap-2">
+        <i class="fas fa-id-card text-blue-500"></i> Hồ Sơ Cá Nhân
+    </h3>
 
-            <label class="text-sm font-medium">Tên hiển thị</label>
-            <input type="text" name="username" value="<?= htmlspecialchars($user["username"]) ?>"
-                class="w-full mt-1 mb-4 p-2 border rounded-lg">
+    <label class="text-sm font-medium">Tên hiển thị</label>
+    <input type="text" name="username"
+           value="<?= htmlspecialchars($user["username"]) ?>"
+           class="w-full mt-1 mb-4 p-2 border rounded-lg">
 
-            <label class="text-sm font-medium">Email</label>
-            <input type="email" name="email" value="<?= htmlspecialchars($user["email"]) ?>"
-                class="w-full mt-1 mb-4 p-2 border rounded-lg">
+    <label class="text-sm font-medium">Email</label>
+    <input type="email" name="email"
+           value="<?= htmlspecialchars($user["email"]) ?>"
+           class="w-full mt-1 mb-4 p-2 border rounded-lg">
 
-            <label class="text-sm font-medium">Giới tính</label>
-            <select name="gender" class="w-full mt-1 mb-4 p-2 border rounded-lg">
-                <option value="">-- Chọn giới tính --</option>
-                <option value="Nam" <?= ($user["gender"] ?? '') === "Nam" ? "selected" : "" ?>>Nam</option>
-                <option value="Nữ" <?= ($user["gender"] ?? '') === "Nữ" ? "selected" : "" ?>>Nữ</option>
-                <option value="Khác" <?= ($user["gender"] ?? '') === "Khác" ? "selected" : "" ?>>Khác</option>
-            </select>
-            
-            <label class="text-sm font-medium">Số điện thoại</label>
-            <input type="text" name="tel" value="<?= htmlspecialchars($user["tel"] ?? "") ?>"
-                class="w-full mt-1 mb-4 p-2 border rounded-lg" placeholder="VD: 0123456789">
+    <label class="text-sm font-medium">Giới tính</label>
+    <select name="gender" class="w-full mt-1 mb-4 p-2 border rounded-lg">
+        <option value="">-- Chọn giới tính --</option>
+        <option value="Nam" <?= ($user["gender"] ?? '') === "Nam" ? "selected" : "" ?>>Nam</option>
+        <option value="Nữ" <?= ($user["gender"] ?? '') === "Nữ" ? "selected" : "" ?>>Nữ</option>
+        <option value="Khác" <?= ($user["gender"] ?? '') === "Khác" ? "selected" : "" ?>>Khác</option>
+    </select>
 
-            <button name="update_profile" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-                Cập Nhật Thông Tin
-            </button>
-        </form>
+    <label class="text-sm font-medium">Số điện thoại</label>
+    <input type="text" name="tel"
+           value="<?= htmlspecialchars($user["tel"] ?? "") ?>"
+           class="w-full mt-1 mb-4 p-2 border rounded-lg">
 
-        <!-- ĐỔI MẬT KHẨU -->
-        <form method="post" class="bg-white/80 shadow-lg rounded-xl p-6">
-            <h3 class="text-lg font-semibold mb-4 flex gap-2">
-                <i class="fas fa-lock text-orange-500"></i> Đổi Mật Khẩu
-            </h3>
+    <!-- 🌱 MỤC TIÊU SỨC KHOẺ -->
+    <label class="text-sm font-medium">Mục tiêu sức khoẻ</label>
+    <input type="text" name="health_goal"
+           value="<?= htmlspecialchars($user["health_goal"] ?? "") ?>"
+           placeholder="VD: Tập thể dục mỗi ngày"
+           class="w-full mt-1 mb-4 p-2 border rounded-lg">
 
-            <label class="text-sm font-medium">Mật khẩu hiện tại</label>
-            <input type="password" name="old_password" class="w-full mt-1 mb-3 p-2 border rounded-lg">
+    <button name="update_profile"
+            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+        Cập Nhật Thông Tin
+    </button>
+</form>
 
-            <label class="text-sm font-medium">Mật khẩu mới</label>
-            <input type="password" name="new_password" class="w-full mt-1 mb-3 p-2 border rounded-lg">
+<!-- ĐỔI MẬT KHẨU -->
+<form method="post" class="bg-white/80 shadow-lg rounded-xl p-6">
+    <h3 class="text-lg font-semibold mb-4 flex gap-2">
+        <i class="fas fa-lock text-orange-500"></i> Đổi Mật Khẩu
+    </h3>
 
-            <label class="text-sm font-medium">Xác nhận mật khẩu mới</label>
-            <input type="password" name="confirm_password" class="w-full mt-1 mb-4 p-2 border rounded-lg">
+    <label class="text-sm font-medium">Mật khẩu hiện tại</label>
+    <input type="password" name="old_password"
+           class="w-full mt-1 mb-3 p-2 border rounded-lg">
 
-            <button name="change_password" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
-                Đổi Mật Khẩu
-            </button>
-        </form>
+    <label class="text-sm font-medium">Mật khẩu mới</label>
+    <input type="password" name="new_password"
+           class="w-full mt-1 mb-3 p-2 border rounded-lg">
 
-    </div>
+    <label class="text-sm font-medium">Xác nhận mật khẩu mới</label>
+    <input type="password" name="confirm_password"
+           class="w-full mt-1 mb-4 p-2 border rounded-lg">
 
-    <?php include "footer.php"; ?>
+    <button name="change_password"
+            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
+        Đổi Mật Khẩu
+    </button>
+</form>
+
+</div>
+
+<?php include "footer.php"; ?>
+
+</body>
+</html>
 
     <!-- ===================== POP-UP Ở GIỮA MÀN HÌNH ===================== -->
     <script>
