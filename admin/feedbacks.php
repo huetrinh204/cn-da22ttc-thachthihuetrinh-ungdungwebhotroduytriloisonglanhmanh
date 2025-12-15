@@ -56,6 +56,23 @@ $total = $pdo->query("SELECT COUNT(*) FROM feedbacks")->fetchColumn();
 $new = $pdo->query("SELECT COUNT(*) FROM feedbacks WHERE status_fb = 'unread'")->fetchColumn();
 $unprocessed = $pdo->query("SELECT COUNT(*) FROM feedbacks WHERE status_fb = 'unread'")->fetchColumn();
 $done = $pdo->query("SELECT COUNT(*) FROM feedbacks WHERE status_fb = 'read'")->fetchColumn();
+
+
+/* =============================
+   LỌC THEO TRẠNG THÁI
+============================= */
+$status = $_GET['status'] ?? 'all';
+
+$whereSql = "";
+$params = [];
+
+if ($status === 'unread') {
+    $whereSql = "WHERE f.status_fb = ?";
+    $params[] = "unread";
+} elseif ($status === 'read') {
+    $whereSql = "WHERE f.status_fb = ?";
+    $params[] = "read";
+}
 ?>
 
 <!DOCTYPE html>
@@ -72,34 +89,56 @@ $done = $pdo->query("SELECT COUNT(*) FROM feedbacks WHERE status_fb = 'read'")->
 
     <?php include "navbar.php"; ?>
 
-    <div class="px-6 py-6">
+ 
 
         <!-- HEADER -->
-        <div class="bg-cyan-50 rounded-xl p-6 mb-6">
-            <h1 class="text-xl font-bold text-purple-600">Quản Lý Phản Hồi</h1>
-            <p class="text-sm text-gray-500">Xử lý phản hồi và hỗ trợ người dùng</p>
+        <div class="px-10 py-5">
+            <h1 class="text-3xl font-bold" style="color:#ffffff; text-shadow:2px 2px 6px rgba(0,0,0,0.5)">Quản Lý Phản Hồi
+        </h1>
+            <p class="text-gray-700 mb-6">Xử lý phản hồi và hỗ trợ người dùng</p>
 
-            <!-- STATS -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
-                <?php
-                $cards = [
-                    ["Tổng số", $total, "text-blue-500", "ri-message-3-line"],
-                    ["Mới", $new, "text-indigo-500", "ri-notification-3-line"],
-                    ["Chưa xử lý", $unprocessed, "text-orange-500", "ri-time-line"],
-                    ["Đã giải quyết", $done, "text-green-500", "ri-checkbox-circle-line"]
-                ];
-                foreach ($cards as $c):
-                    ?>
-                    <div class="bg-white rounded-xl shadow p-4 flex justify-between items-center">
-                        <div>
-                            <p class="text-sm text-gray-500"><?= $c[0] ?></p>
-                            <p class="text-xl font-bold"><?= $c[1] ?></p>
-                        </div>
-                        <i class="<?= $c[3] ?> text-3xl <?= $c[2] ?>"></i>
-                    </div>
-                <?php endforeach; ?>
+        <!-- TỔNG QUAN -->
+
+    
+    <!-- STATS -->
+    <div class="w-full mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+
+            <!-- TỔNG SỐ -->
+            <div class="bg-white shadow rounded-lg p-5 text-center">
+                <p class="text-gray-500">Tổng phản hồi</p>
+                <h2 class="text-3xl font-bold text-blue-600">
+                    <?= $total ?>
+                </h2>
             </div>
+
+            <!-- MỚI -->
+            <div class="bg-white shadow rounded-lg p-5 text-center">
+                <p class="text-gray-500">Phản hồi mới</p>
+                <h2 class="text-3xl font-bold text-indigo-600">
+                    <?= $new ?>
+                </h2>
+            </div>
+
+            <!-- CHƯA XỬ LÝ -->
+            <div class="bg-white shadow rounded-lg p-5 text-center">
+                <p class="text-gray-500">Chưa xử lý</p>
+                <h2 class="text-3xl font-bold text-orange-500">
+                    <?= $unprocessed ?>
+                </h2>
+            </div>
+
+            <!-- ĐÃ XỬ LÝ -->
+            <div class="bg-white shadow rounded-lg p-5 text-center">
+                <p class="text-gray-500">Đã giải quyết</p>
+                <h2 class="text-3xl font-bold text-green-600">
+                    <?= $done ?>
+                </h2>
+            </div>
+
         </div>
+    </div>
+
 
         <!-- LIST FEEDBACK -->
         <div class="space-y-4">
@@ -161,8 +200,8 @@ $done = $pdo->query("SELECT COUNT(*) FROM feedbacks WHERE status_fb = 'read'")->
                 </div>
             <?php endforeach; ?>
         </div>
-
-    </div>
+</div>
+    
 </body>
 
 </html>
