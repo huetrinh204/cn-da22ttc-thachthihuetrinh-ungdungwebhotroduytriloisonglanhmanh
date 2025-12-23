@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: admin/index.php");
         exit();
       } else {
-        header("Location: index.php");
+        header("Location: dashboard.php");
         exit();
       }
     }
@@ -359,7 +359,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       popupText.innerText = "<?= $popup ?>";
       popup.style.display = "flex";
       <?php if ($success): ?>
-        setTimeout(function () { window.location.href = 'index.php'; }, 1000);
+        setTimeout(function () { window.location.href = 'dashboard.php'; }, 1000);
       <?php endif; ?>
     <?php endif; ?>
   </script>

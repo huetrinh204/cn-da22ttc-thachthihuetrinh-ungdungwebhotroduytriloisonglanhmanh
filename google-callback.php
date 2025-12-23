@@ -38,6 +38,6 @@ if (isset($_GET['code'])) {
     $_SESSION["email"] = $user["email"];
     $_SESSION["role"] = $user["role"];
 
-    header("Location: index.php");
+    header("Location: dashboard.php");
     exit();
 }

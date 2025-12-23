@@ -182,7 +182,7 @@ if ($progress_percent == 100) {
   </div>
 
  <?php if (!empty($health_goal)): ?>
-  <div class="fixed right-32 top-28 z-40">
+  <div class="fixed right-10 bottom-0 z-40">
 
     <div class="w-35 h-35 rounded-full
            bg-gradient-to-br from-yellow-100 to-yellow-200

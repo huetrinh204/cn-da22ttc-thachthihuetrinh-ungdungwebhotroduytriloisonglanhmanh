@@ -1,4 +1,5 @@
 <?php
+session_start();
 require "config.php";
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -39,8 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         VALUES 
         (:username, :email, :password, :gender, :tel, :health_goal, 'user', NOW())";
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
+$stmt = $pdo->prepare($sql);
+$stmt->execute([
   ":username" => $username,
   ":email" => $email,
   ":password" => $hashedPassword,
@@ -48,8 +49,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   ":tel" => $tel,
   ":health_goal" => $health_goal
 ]);
-        $popup = "Đăng ký thành công!";
-        $success = true; // đánh dấu thành công
+
+// Lấy ID user vừa tạo
+$user_id = $pdo->lastInsertId();
+
+// LƯU SESSION (giống trang đăng nhập)
+$_SESSION["user_id"] = $user_id;
+$_SESSION["username"] = $username;
+$_SESSION["email"] = $email;
+$_SESSION["role"] = "user";
+$_SESSION["is_blocked"] = 0; // mặc định chưa bị khóa
+
+$popup = "Đăng ký thành công! Đang chuyển hướng...";
+$success = true;
       }
     } catch (PDOException $e) {
       $popup = "Lỗi đăng ký: " . $e->getMessage();
@@ -350,8 +362,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
     </style>
 
-
-
     <script>
       <?php if (!empty($popup)): ?>
         const popup = document.getElementById('popup');
@@ -359,7 +369,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         popupText.innerText = "<?= $popup ?>";
         popup.style.display = "flex";
         <?php if (isset($success) && $success): ?>
-          setTimeout(function () { window.location.href = 'dangnhap.php'; }, 1000);
+          setTimeout(function () { window.location.href = 'index.php'; }, 1000);
         <?php endif; ?>
       <?php endif; ?>
     </script>
