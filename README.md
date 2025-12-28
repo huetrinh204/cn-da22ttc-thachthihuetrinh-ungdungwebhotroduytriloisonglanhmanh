@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🐱 Habitu
-### *Ứng dụng web hỗ trợ duy trì thói quen lành mạnh*
+### *Ứng dụng web hỗ trợ duy trì lối sống lành mạnh*
 
 ![Habitu Banner](./assets/images/welcome.png)
 
