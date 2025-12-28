@@ -97,7 +97,7 @@ habitu/
 ├── 🏠 index.php             # Trang chủ & onboarding
 ├── 📊 dashboard.php         # Bảng điều khiển chính
 ├── 🔐 dangnhap.php          # Đăng nhập
-├── � dLangky.php            # Đăng ký
+├── � dangky.php            # Đăng ký
 ├── 📔 journal.php           # Nhật ký cảm xúc
 ├── 🌐 community.php         # Cộng đồng
 ├── ⚙️ config.php            # Cấu hình database
